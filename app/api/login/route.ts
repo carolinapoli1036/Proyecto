@@ -23,6 +23,7 @@ export async function POST(request: Request) {
         nombre: usuario.nombre,
         perfil: usuario.perfil,
         universidad: usuario.universidad,
+        tipo_conductor: usuario.tipo_conductor,
       }
     }, { status: 200 });
 

@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import Sidebar from "./components/Sidebar";
 
 export const metadata: Metadata = {
-  title: "CarPooling App",
-  description: "Sistema de carpooling",
+  title: "CarPoolDrive",
+  description: "Sistema de carpooling universitario",
 };
 
 export default function RootLayout({
@@ -13,34 +14,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body>
-        <div className="flex min-h-screen">
-
-          {/* Sidebar */}
-          <aside className="w-64 bg-primary text-primary-content flex flex-col p-4 gap-2">
-            <h1 className="text-xl font-bold mb-4">🚗 CarPooling</h1>
-
-            <p className="text-xs font-bold opacity-60 uppercase mt-2">General</p>
-            <a href="/" className="btn btn-ghost justify-start">🏠 Inicio</a>
-            <a href="/login" className="btn btn-ghost justify-start">🔐 Login</a>
-            <a href="/register" className="btn btn-ghost justify-start">📝 Registro</a>
-
-            <p className="text-xs font-bold opacity-60 uppercase mt-4">Administrador</p>
-            <a href="/admin/dashboard" className="btn btn-ghost justify-start">📊 Dashboard Admin</a>
-            <a href="/admin/users" className="btn btn-ghost justify-start">👥 Usuarios</a>
-            <a href="/admin/vehicles" className="btn btn-ghost justify-start">🚘 Vehículos</a>
-            <a href="/admin/routes" className="btn btn-ghost justify-start">🗺️ Rutas</a>
-
-            <p className="text-xs font-bold opacity-60 uppercase mt-4">Perfiles</p>
-            <a href="/driver/dashboard" className="btn btn-ghost justify-start">🧑‍✈️ Conductor</a>
-            <a href="/passenger/dashboard" className="btn btn-ghost justify-start">🧑‍💼 Pasajero</a>
-          </aside>
-
-          {/* Contenido principal */}
-          <main className="flex-1">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
+      </head>
+      <body style={{ fontFamily: "'DM Sans', system-ui, sans-serif", margin: 0 }}>
+        <div style={{ display: 'flex', minHeight: '100vh' }}>
+          <Sidebar />
+          <main style={{ flex: 1 }}>
             {children}
           </main>
-
         </div>
       </body>
     </html>
