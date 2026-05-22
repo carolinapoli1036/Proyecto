@@ -189,7 +189,22 @@ export default function PassengerDashboard() {
   return (
     <div style={{ background: '#EDEDE9', minHeight: '100vh', flex: 1, fontFamily: sans }}>
 
-      <div style={{ background: '#1a1a1a', padding: '0 40px', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <style>{`
+        @media (max-width: 768px) {
+          .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
+          .hero-section { padding: 32px 20px 40px !important; }
+          .hero-title { font-size: 32px !important; }
+          .dashboard-content { padding: 16px !important; }
+          .navbar { padding: 0 16px !important; }
+          .card { padding: 20px 16px !important; }
+          .buscar-grid { grid-template-columns: 1fr !important; }
+          .ruta-card { grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
+          .reserva-card { grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
+          .viaje-gratis-banner { flex-direction: column !important; gap: 10px !important; }
+        }
+      `}</style>
+
+      <div className="navbar" style={{ background: '#1a1a1a', padding: '0 40px', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span style={{ fontSize: '14px', fontWeight: 500, color: '#fff', fontFamily: sans }}>CarPoolDrive — Pasajero</span>
         <button onClick={() => { localStorage.removeItem('usuario'); window.location.href = '/login'; }}
           style={{ fontSize: '12px', color: '#9E9890', background: 'none', border: '0.5px solid #3a3a3a', borderRadius: '6px', padding: '7px 16px', cursor: 'pointer', fontFamily: sans }}>
@@ -197,34 +212,34 @@ export default function PassengerDashboard() {
         </button>
       </div>
 
-      <div style={{ background: '#1a1a1a', padding: '52px 40px 60px', position: 'relative', overflow: 'hidden' }}>
+      <div className="hero-section" style={{ background: '#1a1a1a', padding: '52px 40px 60px', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: '-100px', right: '-100px', width: '500px', height: '500px', borderRadius: '50%', border: '0.5px solid rgba(255,255,255,0.04)' }} />
         <div style={{ position: 'absolute', top: '-40px', right: '-40px', width: '350px', height: '350px', borderRadius: '50%', border: '0.5px solid rgba(255,255,255,0.06)' }} />
 
         <div style={{ position: 'relative', zIndex: 1 }}>
           <p style={{ fontSize: '11px', color: '#6b6b6b', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '16px', fontFamily: sans }}>Panel de pasajero</p>
-          <h1 style={{ fontSize: '42px', fontWeight: 400, color: '#fff', marginBottom: '8px', lineHeight: 1.1, fontFamily: serif }}>
+          <h1 className="hero-title" style={{ fontSize: '42px', fontWeight: 400, color: '#fff', marginBottom: '8px', lineHeight: 1.1, fontFamily: serif }}>
             Hola, <em style={{ fontStyle: 'italic', color: '#D6CCC2' }}>{usuario?.nombre?.split(' ')[0] ?? '...'}</em>
           </h1>
-          <p style={{ fontSize: '13px', color: '#6b6b6b', fontFamily: sans, marginBottom: '48px' }}>Carpooling universitario · Medellin</p>
+          <p style={{ fontSize: '13px', color: '#6b6b6b', fontFamily: sans, marginBottom: '32px' }}>Carpooling universitario · Medellin</p>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1px', background: 'rgba(255,255,255,0.08)', borderRadius: '14px', overflow: 'hidden' }}>
+          <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1px', background: 'rgba(255,255,255,0.08)', borderRadius: '14px', overflow: 'hidden' }}>
             {[
               { label: 'Viajes realizados', value: String(viajesCompletados) },
               { label: 'Proximo viaje', value: proximoViaje ? proximoViaje.hora_salida : '—' },
               { label: 'Mis puntos', value: String(puntos) },
               { label: 'Viajes gratis', value: String(viajesGratisDisponibles) },
             ].map((stat, i) => (
-              <div key={i} style={{ background: '#111', padding: '24px 28px' }}>
-                <p style={{ fontSize: '10px', color: '#6b6b6b', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '14px', fontFamily: sans }}>{stat.label}</p>
-                <p style={{ fontSize: '32px', fontWeight: 400, color: i === 3 && viajesGratisDisponibles > 0 ? '#fbbf24' : '#fff', lineHeight: 1, fontFamily: serif }}>{stat.value}</p>
+              <div key={i} style={{ background: '#111', padding: '20px 16px' }}>
+                <p style={{ fontSize: '10px', color: '#6b6b6b', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '10px', fontFamily: sans }}>{stat.label}</p>
+                <p style={{ fontSize: '28px', fontWeight: 400, color: i === 3 && viajesGratisDisponibles > 0 ? '#fbbf24' : '#fff', lineHeight: 1, fontFamily: serif }}>{stat.value}</p>
                 {i === 2 && <p style={{ fontSize: '11px', color: '#4a4a4a', marginTop: '6px', fontFamily: sans }}>{puntosParaSiguiente} pts para viaje gratis</p>}
               </div>
             ))}
           </div>
 
           {viajesGratisDisponibles > 0 && (
-            <div style={{ marginTop: '16px', background: 'rgba(251,191,36,0.1)', border: '0.5px solid #fbbf2440', borderRadius: '10px', padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div className="viaje-gratis-banner" style={{ marginTop: '16px', background: 'rgba(251,191,36,0.1)', border: '0.5px solid #fbbf2440', borderRadius: '10px', padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
                 <p style={{ fontSize: '14px', fontWeight: 500, color: '#fbbf24', fontFamily: sans, marginBottom: '4px' }}>
                   Tienes {viajesGratisDisponibles} viaje{viajesGratisDisponibles > 1 ? 's' : ''} gratis disponible{viajesGratisDisponibles > 1 ? 's' : ''}
@@ -251,14 +266,14 @@ export default function PassengerDashboard() {
         </div>
       </div>
 
-      <div style={{ padding: '36px 40px' }}>
+      <div className="dashboard-content" style={{ padding: '36px 40px' }}>
         {mensaje && <div style={{ background: '#1a1a1a', color: '#D6CCC2', borderRadius: '10px', padding: '14px 20px', fontSize: '13px', marginBottom: '24px', fontFamily: sans }}>{mensaje}</div>}
         {error && <div style={{ background: '#fee2e2', color: '#991b1b', borderRadius: '10px', padding: '14px 20px', fontSize: '13px', marginBottom: '24px', fontFamily: sans }}>{error}</div>}
 
         {/* Buscar ruta */}
-        <div style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '20px' }}>
+        <div className="card" style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '20px' }}>
           <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>Buscar ruta</p>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '16px', alignItems: 'flex-end' }}>
+          <div className="buscar-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '16px', alignItems: 'flex-end' }}>
             <div>
               <label style={{ fontSize: '11px', color: '#9E9890', display: 'block', marginBottom: '8px', fontFamily: sans }}>Origen</label>
               <select style={selectStyle} value={filtro.origen} onChange={e => setFiltro({ ...filtro, origen: e.target.value })}>
@@ -279,20 +294,20 @@ export default function PassengerDashboard() {
         </div>
 
         {/* Mapa */}
-        <div style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '20px' }}>
+        <div className="card" style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '20px' }}>
           <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>Mapa de rutas</p>
           <MapaRutas tipo="pasajero" />
         </div>
 
         {/* Rutas disponibles */}
-        <div style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '20px' }}>
+        <div className="card" style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '20px' }}>
           <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>Rutas disponibles</p>
           {rutas.length === 0 ? (
             <p style={{ color: '#9E9890', fontSize: '13px', textAlign: 'center', padding: '32px 0', fontFamily: sans }}>No hay rutas disponibles.</p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {rutas.map((ruta: any) => (
-                <div key={ruta.id} style={{ display: 'grid', gridTemplateColumns: '1.5fr 1.5fr 1fr 80px 80px auto', gap: '16px', alignItems: 'center', padding: '18px 20px', background: '#FAFAF8', border: '0.5px solid #EDEDE9', borderRadius: '10px' }}>
+                <div className="ruta-card" key={ruta.id} style={{ display: 'grid', gridTemplateColumns: '1.5fr 1.5fr 1fr 80px 80px auto', gap: '16px', alignItems: 'center', padding: '18px 20px', background: '#FAFAF8', border: '0.5px solid #EDEDE9', borderRadius: '10px' }}>
                   <div>
                     <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>ORIGEN</p>
                     <p style={{ fontSize: '13px', color: '#1a1a1a', fontWeight: 500, fontFamily: sans }}>{ruta.origen}</p>
@@ -332,14 +347,14 @@ export default function PassengerDashboard() {
         </div>
 
         {/* Mis reservas */}
-        <div style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px' }}>
+        <div className="card" style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px' }}>
           <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>Mis reservas</p>
           {misReservas.length === 0 ? (
             <p style={{ color: '#9E9890', fontSize: '13px', textAlign: 'center', padding: '32px 0', fontFamily: sans }}>No tienes reservas aun.</p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {misReservas.map((reserva: any) => (
-                <div key={reserva.id} style={{ display: 'grid', gridTemplateColumns: '2fr 80px auto auto', gap: '16px', alignItems: 'center', padding: '18px 20px', background: '#FAFAF8', border: '0.5px solid #EDEDE9', borderRadius: '10px' }}>
+                <div className="reserva-card" key={reserva.id} style={{ display: 'grid', gridTemplateColumns: '2fr 80px auto auto', gap: '16px', alignItems: 'center', padding: '18px 20px', background: '#FAFAF8', border: '0.5px solid #EDEDE9', borderRadius: '10px' }}>
                   <div>
                     <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>RUTA</p>
                     <p style={{ fontSize: '13px', color: '#1a1a1a', fontWeight: 500, fontFamily: sans }}>{reserva.origen} → {reserva.destino}</p>

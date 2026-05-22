@@ -205,7 +205,22 @@ export default function DriverDashboard() {
   return (
     <div style={{ background: '#EDEDE9', minHeight: '100vh', flex: 1, fontFamily: sans }}>
 
-      <div style={{ background: '#1a1a1a', padding: '0 40px', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <style>{`
+        @media (max-width: 768px) {
+          .stats-grid-5 { grid-template-columns: repeat(2, 1fr) !important; }
+          .hero-section { padding: 32px 20px 40px !important; }
+          .hero-title { font-size: 32px !important; }
+          .dashboard-content { padding: 16px !important; }
+          .navbar { padding: 0 16px !important; }
+          .card { padding: 20px 16px !important; }
+          .vehiculo-grid { grid-template-columns: repeat(2, 1fr) !important; }
+          .form-ruta-grid { grid-template-columns: 1fr 1fr !important; }
+          .ruta-row { grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
+          .badges-row { flex-wrap: wrap !important; gap: 8px !important; }
+        }
+      `}</style>
+
+      <div className="navbar" style={{ background: '#1a1a1a', padding: '0 40px', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span style={{ fontSize: '14px', fontWeight: 500, color: '#fff', fontFamily: sans }}>CarPoolDrive — Conductor</span>
         <button onClick={() => { localStorage.removeItem('usuario'); window.location.href = '/login'; }}
           style={{ fontSize: '12px', color: '#9E9890', background: 'none', border: '0.5px solid #3a3a3a', borderRadius: '6px', padding: '7px 16px', cursor: 'pointer', fontFamily: sans }}>
@@ -213,13 +228,13 @@ export default function DriverDashboard() {
         </button>
       </div>
 
-      <div style={{ background: '#1a1a1a', padding: '52px 40px 60px', position: 'relative', overflow: 'hidden' }}>
+      <div className="hero-section" style={{ background: '#1a1a1a', padding: '52px 40px 60px', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: '-100px', right: '-100px', width: '500px', height: '500px', borderRadius: '50%', border: '0.5px solid rgba(255,255,255,0.04)' }} />
         <div style={{ position: 'absolute', top: '-40px', right: '-40px', width: '350px', height: '350px', borderRadius: '50%', border: '0.5px solid rgba(255,255,255,0.06)' }} />
 
         <div style={{ position: 'relative', zIndex: 1 }}>
           <p style={{ fontSize: '11px', color: '#6b6b6b', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '16px', fontFamily: sans }}>Panel de conductor</p>
-          <h1 style={{ fontSize: '42px', fontWeight: 400, color: '#fff', marginBottom: '16px', lineHeight: 1.1, fontFamily: serif }}>
+          <h1 className="hero-title" style={{ fontSize: '42px', fontWeight: 400, color: '#fff', marginBottom: '16px', lineHeight: 1.1, fontFamily: serif }}>
             Hola, <em style={{ fontStyle: 'italic', color: '#D6CCC2' }}>{usuario?.nombre?.split(' ')[0] ?? '...'}</em>
           </h1>
 
@@ -237,7 +252,7 @@ export default function DriverDashboard() {
             </div>
           )}
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '32px', flexWrap: 'wrap' }}>
+          <div className="badges-row" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '32px', flexWrap: 'wrap' }}>
             {vehiculo && <span style={{ fontSize: '12px', color: '#6b6b6b', fontFamily: sans }}>{vehiculo.marca} {vehiculo.modelo} · {vehiculo.placa}</span>}
             {usuario?.tipo_conductor && (
               <span style={{ fontSize: '11px', padding: '4px 12px', borderRadius: '20px', fontFamily: sans, fontWeight: 500, background: usuario.tipo_conductor === 'docente' ? '#2e2a1a' : '#1e2a1e', color: usuario.tipo_conductor === 'docente' ? '#fcd34d' : '#86efac', border: `0.5px solid ${usuario.tipo_conductor === 'docente' ? '#fcd34d40' : '#86efac40'}` }}>
@@ -252,7 +267,7 @@ export default function DriverDashboard() {
             )}
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '1px', background: 'rgba(255,255,255,0.08)', borderRadius: '14px', overflow: 'hidden' }}>
+          <div className="stats-grid-5" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '1px', background: 'rgba(255,255,255,0.08)', borderRadius: '14px', overflow: 'hidden' }}>
             {[
               { label: 'Mis rutas', value: String(rutas.length) },
               { label: 'Pasajeros activos', value: String(pasajerosActivos) },
@@ -260,9 +275,9 @@ export default function DriverDashboard() {
               { label: 'Mis puntos', value: String(rutasCompletadas * 15) },
               { label: 'Nivel', value: nivel },
             ].map((stat, i) => (
-              <div key={i} style={{ background: '#111', padding: '24px 20px' }}>
-                <p style={{ fontSize: '10px', color: '#6b6b6b', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '14px', fontFamily: sans }}>{stat.label}</p>
-                <p style={{ fontSize: '26px', fontWeight: 400, color: stat.label === 'Nivel' ? (nivel === 'Elite' ? '#fbbf24' : nivel === 'Destacado' ? '#c4b5fd' : '#fff') : '#fff', lineHeight: 1, fontFamily: serif }}>{stat.value}</p>
+              <div key={i} style={{ background: '#111', padding: '20px 16px' }}>
+                <p style={{ fontSize: '10px', color: '#6b6b6b', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '10px', fontFamily: sans }}>{stat.label}</p>
+                <p style={{ fontSize: '22px', fontWeight: 400, color: stat.label === 'Nivel' ? (nivel === 'Elite' ? '#fbbf24' : nivel === 'Destacado' ? '#c4b5fd' : '#fff') : '#fff', lineHeight: 1, fontFamily: serif }}>{stat.value}</p>
               </div>
             ))}
           </div>
@@ -285,12 +300,12 @@ export default function DriverDashboard() {
         </div>
       </div>
 
-      <div style={{ padding: '32px 40px' }}>
+      <div className="dashboard-content" style={{ padding: '32px 40px' }}>
         {mensaje && <div style={{ background: '#1a1a1a', color: '#D6CCC2', borderRadius: '10px', padding: '14px 20px', fontSize: '13px', marginBottom: '24px', fontFamily: sans }}>Listo: {mensaje}</div>}
         {error && <div style={{ background: '#fee2e2', color: '#991b1b', borderRadius: '10px', padding: '14px 20px', fontSize: '13px', marginBottom: '24px', fontFamily: sans }}>{error}</div>}
 
         {/* Vehiculo */}
-        <div style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '20px' }}>
+        <div className="card" style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: vehiculo || mostrarFormVehiculo ? '20px' : '0' }}>
             <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', fontFamily: sans }}>Mi vehiculo</p>
             {!vehiculo && (
@@ -301,7 +316,7 @@ export default function DriverDashboard() {
             )}
           </div>
           {vehiculo && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
+            <div className="vehiculo-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
               {[{ l: 'Placa', v: vehiculo.placa }, { l: 'Vehiculo', v: `${vehiculo.marca} ${vehiculo.modelo}` }, { l: 'Color', v: vehiculo.color }, { l: 'Puestos', v: vehiculo.puestos }].map((item, i) => (
                 <div key={i} style={{ background: '#FAFAF8', border: '0.5px solid #EDEDE9', borderRadius: '10px', padding: '16px' }}>
                   <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '6px', fontFamily: sans, letterSpacing: '1px', textTransform: 'uppercase' }}>{item.l}</p>
@@ -314,7 +329,7 @@ export default function DriverDashboard() {
             <>
               {mensajeVehiculo && <div style={{ background: '#d1fae5', color: '#065f46', borderRadius: '8px', padding: '12px 16px', fontSize: '13px', marginBottom: '16px', fontFamily: sans }}>{mensajeVehiculo}</div>}
               {errorVehiculo && <div style={{ background: '#fee2e2', color: '#991b1b', borderRadius: '8px', padding: '12px 16px', fontSize: '13px', marginBottom: '16px', fontFamily: sans }}>{errorVehiculo}</div>}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr) auto', gap: '16px', alignItems: 'flex-end' }}>
+              <div className="form-ruta-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr) auto', gap: '16px', alignItems: 'flex-end' }}>
                 {[{ label: 'Placa', placeholder: 'ABC-123', key: 'placa' }, { label: 'Marca', placeholder: 'Mazda', key: 'marca' }, { label: 'Modelo', placeholder: '2020', key: 'modelo' }, { label: 'Color', placeholder: 'Rojo', key: 'color' }].map(f => (
                   <div key={f.key}>
                     <label style={labelStyle}>{f.label}</label>
@@ -332,9 +347,9 @@ export default function DriverDashboard() {
         </div>
 
         {/* Publicar ruta */}
-        <div style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '20px' }}>
+        <div className="card" style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '20px' }}>
           <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>Publicar nueva ruta</p>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto auto auto', gap: '16px', alignItems: 'flex-end' }}>
+          <div className="form-ruta-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto auto auto', gap: '16px', alignItems: 'flex-end' }}>
             <div>
               <label style={labelStyle}>Origen</label>
               <select style={inputStyle} value={formRuta.origen} onChange={e => setFormRuta({ ...formRuta, origen: e.target.value })}>
@@ -367,20 +382,20 @@ export default function DriverDashboard() {
         </div>
 
         {/* Mapa */}
-        <div style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '20px' }}>
+        <div className="card" style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '20px' }}>
           <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>Mapa de mis rutas</p>
           <MapaRutas tipo="conductor" usuario_id={usuario?.id} />
         </div>
 
         {/* Mis rutas */}
-        <div style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px' }}>
+        <div className="card" style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px' }}>
           <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>Mis rutas</p>
           {rutas.length === 0 ? (
             <p style={{ color: '#9E9890', fontSize: '13px', textAlign: 'center', padding: '32px 0', fontFamily: sans }}>No tienes rutas registradas.</p>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {rutas.map((ruta: any) => (
-                <div key={ruta.id} style={{ display: 'grid', gridTemplateColumns: '1.5fr 1.5fr 100px 80px 80px auto auto', gap: '16px', alignItems: 'center', padding: '18px 20px', background: '#FAFAF8', border: '0.5px solid #EDEDE9', borderRadius: '10px' }}>
+                <div className="ruta-row" key={ruta.id} style={{ display: 'grid', gridTemplateColumns: '1.5fr 1.5fr 100px 80px 80px auto auto', gap: '16px', alignItems: 'center', padding: '18px 20px', background: '#FAFAF8', border: '0.5px solid #EDEDE9', borderRadius: '10px' }}>
                   <div>
                     <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>ORIGEN</p>
                     <p style={{ fontSize: '13px', color: '#1a1a1a', fontWeight: 500, fontFamily: sans }}>{ruta.origen}</p>

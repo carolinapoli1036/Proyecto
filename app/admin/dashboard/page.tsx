@@ -60,7 +60,20 @@ export default function AdminDashboard() {
   return (
     <div style={{ background: '#EDEDE9', minHeight: '100vh', flex: 1, fontFamily: sans }}>
 
-      <div style={{ background: '#1a1a1a', padding: '0 40px', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <style>{`
+        @media (max-width: 768px) {
+          .stats-grid-admin { grid-template-columns: repeat(2, 1fr) !important; }
+          .hero-section { padding: 32px 20px 40px !important; }
+          .hero-title { font-size: 32px !important; }
+          .dashboard-content { padding: 16px !important; }
+          .navbar { padding: 0 16px !important; }
+          .card { padding: 20px 16px !important; }
+          .botones-admin { grid-template-columns: 1fr !important; }
+          .tabla-wrapper { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
+        }
+      `}</style>
+
+      <div className="navbar" style={{ background: '#1a1a1a', padding: '0 40px', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span style={{ fontSize: '14px', fontWeight: 500, color: '#fff', fontFamily: sans }}>CarPoolDrive — Admin</span>
         <button onClick={() => { localStorage.removeItem('usuario'); window.location.href = '/login'; }}
           style={{ fontSize: '12px', color: '#9E9890', background: 'none', border: '0.5px solid #3a3a3a', borderRadius: '6px', padding: '7px 16px', cursor: 'pointer', fontFamily: sans }}>
@@ -68,17 +81,17 @@ export default function AdminDashboard() {
         </button>
       </div>
 
-      <div style={{ background: '#1a1a1a', padding: '52px 40px 60px', position: 'relative', overflow: 'hidden' }}>
+      <div className="hero-section" style={{ background: '#1a1a1a', padding: '52px 40px 60px', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: '-100px', right: '-100px', width: '500px', height: '500px', borderRadius: '50%', border: '0.5px solid rgba(255,255,255,0.04)' }} />
         <div style={{ position: 'absolute', top: '-40px', right: '-40px', width: '350px', height: '350px', borderRadius: '50%', border: '0.5px solid rgba(255,255,255,0.06)' }} />
 
         <div style={{ position: 'relative', zIndex: 1 }}>
           <p style={{ fontSize: '11px', color: '#6b6b6b', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '16px', fontFamily: sans }}>Panel de administrador</p>
-          <h1 style={{ fontSize: '42px', fontWeight: 400, color: '#fff', marginBottom: '48px', lineHeight: 1.1, fontFamily: serif }}>
+          <h1 className="hero-title" style={{ fontSize: '42px', fontWeight: 400, color: '#fff', marginBottom: '48px', lineHeight: 1.1, fontFamily: serif }}>
             Vista <em style={{ fontStyle: 'italic', color: '#D6CCC2' }}>general</em>
           </h1>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1px', background: 'rgba(255,255,255,0.08)', borderRadius: '14px', overflow: 'hidden' }}>
+          <div className="stats-grid-admin" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1px', background: 'rgba(255,255,255,0.08)', borderRadius: '14px', overflow: 'hidden' }}>
             {[
               { label: 'Usuarios', value: stats.total_usuarios, key: 'usuarios' },
               { label: 'Vehiculos', value: stats.total_vehiculos, key: 'vehiculos' },
@@ -87,9 +100,9 @@ export default function AdminDashboard() {
             ].map((stat, i) => (
               <div key={i}
                 onClick={() => stat.key && setTab(stat.key as any)}
-                style={{ background: tab === stat.key ? '#222' : '#111', padding: '24px 28px', cursor: stat.key ? 'pointer' : 'default', transition: 'background 0.15s' }}>
+                style={{ background: tab === stat.key ? '#222' : '#111', padding: '24px 20px', cursor: stat.key ? 'pointer' : 'default', transition: 'background 0.15s' }}>
                 <p style={{ fontSize: '10px', color: '#6b6b6b', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '14px', fontFamily: sans }}>{stat.label}</p>
-                <p style={{ fontSize: '32px', fontWeight: 400, color: '#fff', lineHeight: 1, marginBottom: '8px', fontFamily: serif }}>{stat.value}</p>
+                <p style={{ fontSize: '28px', fontWeight: 400, color: '#fff', lineHeight: 1, marginBottom: '8px', fontFamily: serif }}>{stat.value}</p>
                 {stat.key && <p style={{ fontSize: '11px', color: '#4a4a4a', fontFamily: sans }}>Click para gestionar</p>}
               </div>
             ))}
@@ -97,19 +110,19 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      <div style={{ padding: '32px 40px' }}>
+      <div className="dashboard-content" style={{ padding: '32px 40px' }}>
 
         {mensaje && <div style={{ background: '#1a1a1a', color: '#D6CCC2', borderRadius: '10px', padding: '14px 20px', fontSize: '13px', marginBottom: '24px', fontFamily: sans }}>✓ {mensaje}</div>}
         {error && <div style={{ background: '#fee2e2', color: '#991b1b', borderRadius: '10px', padding: '14px 20px', fontSize: '13px', marginBottom: '24px', fontFamily: sans }}>{error}</div>}
 
         {/* Mapa */}
-        <div style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '24px' }}>
+        <div className="card" style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '24px' }}>
           <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>Mapa de todas las rutas activas</p>
           <MapaRutas tipo="admin" />
         </div>
 
         {/* Botones */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '24px' }}>
+        <div className="botones-admin" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '24px' }}>
           {[
             { key: 'usuarios', label: 'Gestionar usuarios' },
             { key: 'vehiculos', label: 'Gestionar vehiculos' },
@@ -132,85 +145,89 @@ export default function AdminDashboard() {
 
         {/* Tabla */}
         {tab && (
-          <div style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px' }}>
+          <div className="card" style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px' }}>
             <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>
               {tab === 'usuarios' ? 'Usuarios' : tab === 'vehiculos' ? 'Vehiculos' : 'Rutas'}
             </p>
 
             {datos.length === 0 ? (
               <p style={{ color: '#9E9890', fontSize: '13px', textAlign: 'center', padding: '32px 0', fontFamily: sans }}>No hay datos.</p>
-            ) : tab === 'usuarios' ? (
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr><th style={th}>ID</th><th style={th}>Nombre</th><th style={th}>Correo</th><th style={th}>Perfil</th><th style={th}>Universidad</th><th style={th}>Accion</th></tr>
-                </thead>
-                <tbody>
-                  {datos.map((u: any) => (
-                    <tr key={u.id}>
-                      <td style={td}>{u.id}</td>
-                      <td style={{ ...td, fontWeight: 500 }}>{u.nombre}</td>
-                      <td style={{ ...td, color: '#9E9890' }}>{u.correo}</td>
-                      <td style={td}>{badgePerfil(u.perfil)}</td>
-                      <td style={td}>{u.universidad}</td>
-                      <td style={td}>
-                        <button onClick={() => handleEliminar('usuario', u.id, u.nombre)}
-                          style={{ background: '#fee2e2', color: '#991b1b', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '12px', cursor: 'pointer', fontFamily: sans }}>
-                          Eliminar
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : tab === 'vehiculos' ? (
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr><th style={th}>ID</th><th style={th}>Conductor</th><th style={th}>Placa</th><th style={th}>Vehiculo</th><th style={th}>Color</th><th style={th}>Puestos</th><th style={th}>Accion</th></tr>
-                </thead>
-                <tbody>
-                  {datos.map((v: any) => (
-                    <tr key={v.id}>
-                      <td style={td}>{v.id}</td>
-                      <td style={{ ...td, fontWeight: 500 }}>{v.conductor_nombre}</td>
-                      <td style={{ ...td, fontFamily: 'monospace', fontWeight: 700, letterSpacing: '1px' }}>{v.placa}</td>
-                      <td style={td}>{v.marca} {v.modelo}</td>
-                      <td style={td}>{v.color}</td>
-                      <td style={td}>{v.puestos}</td>
-                      <td style={td}>
-                        <button onClick={() => handleEliminar('vehiculo', v.id, v.placa)}
-                          style={{ background: '#fee2e2', color: '#991b1b', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '12px', cursor: 'pointer', fontFamily: sans }}>
-                          Eliminar
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
             ) : (
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                <thead>
-                  <tr><th style={th}>ID</th><th style={th}>Conductor</th><th style={th}>Origen</th><th style={th}>Destino</th><th style={th}>Hora</th><th style={th}>Estado</th><th style={th}>Reservas</th><th style={th}>Accion</th></tr>
-                </thead>
-                <tbody>
-                  {datos.map((r: any) => (
-                    <tr key={r.id}>
-                      <td style={td}>{r.id}</td>
-                      <td style={{ ...td, fontWeight: 500 }}>{r.conductor_nombre}</td>
-                      <td style={td}>{r.origen}</td>
-                      <td style={td}>{r.destino}</td>
-                      <td style={{ ...td, fontFamily: serif }}>{r.hora_salida}</td>
-                      <td style={td}>{badgeEstado(r.estado)}</td>
-                      <td style={td}>{r.total_reservas}</td>
-                      <td style={td}>
-                        <button onClick={() => handleEliminar('ruta', r.id, `${r.origen}→${r.destino}`)}
-                          style={{ background: '#fee2e2', color: '#991b1b', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '12px', cursor: 'pointer', fontFamily: sans }}>
-                          Eliminar
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <div className="tabla-wrapper">
+                {tab === 'usuarios' ? (
+                  <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }}>
+                    <thead>
+                      <tr><th style={th}>ID</th><th style={th}>Nombre</th><th style={th}>Correo</th><th style={th}>Perfil</th><th style={th}>Universidad</th><th style={th}>Accion</th></tr>
+                    </thead>
+                    <tbody>
+                      {datos.map((u: any) => (
+                        <tr key={u.id}>
+                          <td style={td}>{u.id}</td>
+                          <td style={{ ...td, fontWeight: 500 }}>{u.nombre}</td>
+                          <td style={{ ...td, color: '#9E9890' }}>{u.correo}</td>
+                          <td style={td}>{badgePerfil(u.perfil)}</td>
+                          <td style={td}>{u.universidad}</td>
+                          <td style={td}>
+                            <button onClick={() => handleEliminar('usuario', u.id, u.nombre)}
+                              style={{ background: '#fee2e2', color: '#991b1b', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '12px', cursor: 'pointer', fontFamily: sans }}>
+                              Eliminar
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : tab === 'vehiculos' ? (
+                  <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }}>
+                    <thead>
+                      <tr><th style={th}>ID</th><th style={th}>Conductor</th><th style={th}>Placa</th><th style={th}>Vehiculo</th><th style={th}>Color</th><th style={th}>Puestos</th><th style={th}>Accion</th></tr>
+                    </thead>
+                    <tbody>
+                      {datos.map((v: any) => (
+                        <tr key={v.id}>
+                          <td style={td}>{v.id}</td>
+                          <td style={{ ...td, fontWeight: 500 }}>{v.conductor_nombre}</td>
+                          <td style={{ ...td, fontFamily: 'monospace', fontWeight: 700, letterSpacing: '1px' }}>{v.placa}</td>
+                          <td style={td}>{v.marca} {v.modelo}</td>
+                          <td style={td}>{v.color}</td>
+                          <td style={td}>{v.puestos}</td>
+                          <td style={td}>
+                            <button onClick={() => handleEliminar('vehiculo', v.id, v.placa)}
+                              style={{ background: '#fee2e2', color: '#991b1b', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '12px', cursor: 'pointer', fontFamily: sans }}>
+                              Eliminar
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                ) : (
+                  <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '700px' }}>
+                    <thead>
+                      <tr><th style={th}>ID</th><th style={th}>Conductor</th><th style={th}>Origen</th><th style={th}>Destino</th><th style={th}>Hora</th><th style={th}>Estado</th><th style={th}>Reservas</th><th style={th}>Accion</th></tr>
+                    </thead>
+                    <tbody>
+                      {datos.map((r: any) => (
+                        <tr key={r.id}>
+                          <td style={td}>{r.id}</td>
+                          <td style={{ ...td, fontWeight: 500 }}>{r.conductor_nombre}</td>
+                          <td style={td}>{r.origen}</td>
+                          <td style={td}>{r.destino}</td>
+                          <td style={{ ...td, fontFamily: serif }}>{r.hora_salida}</td>
+                          <td style={td}>{badgeEstado(r.estado)}</td>
+                          <td style={td}>{r.total_reservas}</td>
+                          <td style={td}>
+                            <button onClick={() => handleEliminar('ruta', r.id, `${r.origen}→${r.destino}`)}
+                              style={{ background: '#fee2e2', color: '#991b1b', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '12px', cursor: 'pointer', fontFamily: sans }}>
+                              Eliminar
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
             )}
           </div>
         )}

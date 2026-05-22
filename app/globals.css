@@ -281,3 +281,53 @@ body {
   color: var(--negro);
   margin-bottom: 24px;
 }
+/* ===== RESPONSIVE MÓVIL ===== */
+@media (max-width: 768px) {
+
+  /* Stats grid */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* Form grid */
+  .form-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Rutas grid */
+  .rutas-grid {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+
+  /* Padding general */
+  .dashboard-content {
+    padding: 16px !important;
+  }
+
+  /* Hero padding */
+  .hero-section {
+    padding: 32px 20px 40px !important;
+  }
+
+  /* Navbar padding */
+  .navbar {
+    padding: 0 16px !important;
+  }
+
+  /* Tablas scroll */
+  .tabla-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Botones en columna */
+  .botones-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Mapa altura móvil */
+  #mapa-carpoodrive {
+    height: 280px !important;
+  }
+}
