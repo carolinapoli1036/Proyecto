@@ -30,7 +30,6 @@ export default function LoginPage() {
   return (
     <div style={{ display: 'flex', minHeight: '100vh', flex: 1, fontFamily: sans }}>
 
-      {/* Panel izquierdo */}
       <div style={{ width: '45%', background: '#1a1a1a', padding: '60px 56px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', bottom: '-80px', right: '-80px', width: '350px', height: '350px', borderRadius: '50%', border: '0.5px solid rgba(255,255,255,0.05)' }} />
         <div style={{ position: 'absolute', bottom: '-20px', right: '-20px', width: '220px', height: '220px', borderRadius: '50%', border: '0.5px solid rgba(255,255,255,0.07)' }} />
@@ -59,7 +58,6 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Panel derecho */}
       <div style={{ flex: 1, background: '#EDEDE9', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '60px' }}>
         <div style={{ width: '100%', maxWidth: '380px' }}>
           <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase' as const, marginBottom: '32px', fontFamily: sans }}>Iniciar sesion</p>
@@ -102,7 +100,6 @@ export default function LoginPage() {
           </p>
         </div>
       </div>
-
     </div>
   );
 }

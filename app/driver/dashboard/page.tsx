@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import MapaRutas from '../../components/MapaRutas';
 
 export default function DriverDashboard() {
   const [usuario, setUsuario] = useState<any>(null);
@@ -288,6 +289,7 @@ export default function DriverDashboard() {
         {mensaje && <div style={{ background: '#1a1a1a', color: '#D6CCC2', borderRadius: '10px', padding: '14px 20px', fontSize: '13px', marginBottom: '24px', fontFamily: sans }}>Listo: {mensaje}</div>}
         {error && <div style={{ background: '#fee2e2', color: '#991b1b', borderRadius: '10px', padding: '14px 20px', fontSize: '13px', marginBottom: '24px', fontFamily: sans }}>{error}</div>}
 
+        {/* Vehiculo */}
         <div style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: vehiculo || mostrarFormVehiculo ? '20px' : '0' }}>
             <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', fontFamily: sans }}>Mi vehiculo</p>
@@ -329,6 +331,7 @@ export default function DriverDashboard() {
           )}
         </div>
 
+        {/* Publicar ruta */}
         <div style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '20px' }}>
           <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>Publicar nueva ruta</p>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto auto auto', gap: '16px', alignItems: 'flex-end' }}>
@@ -363,6 +366,13 @@ export default function DriverDashboard() {
           </div>
         </div>
 
+        {/* Mapa */}
+        <div style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '20px' }}>
+          <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>Mapa de mis rutas</p>
+          <MapaRutas tipo="conductor" usuario_id={usuario?.id} />
+        </div>
+
+        {/* Mis rutas */}
         <div style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px' }}>
           <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>Mis rutas</p>
           {rutas.length === 0 ? (

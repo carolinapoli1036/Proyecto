@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import MapaRutas from '../../components/MapaRutas';
 
 export default function PassengerDashboard() {
   const [usuario, setUsuario] = useState<any>(null);
@@ -254,6 +255,7 @@ export default function PassengerDashboard() {
         {mensaje && <div style={{ background: '#1a1a1a', color: '#D6CCC2', borderRadius: '10px', padding: '14px 20px', fontSize: '13px', marginBottom: '24px', fontFamily: sans }}>{mensaje}</div>}
         {error && <div style={{ background: '#fee2e2', color: '#991b1b', borderRadius: '10px', padding: '14px 20px', fontSize: '13px', marginBottom: '24px', fontFamily: sans }}>{error}</div>}
 
+        {/* Buscar ruta */}
         <div style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '20px' }}>
           <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>Buscar ruta</p>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '16px', alignItems: 'flex-end' }}>
@@ -276,6 +278,13 @@ export default function PassengerDashboard() {
           </div>
         </div>
 
+        {/* Mapa */}
+        <div style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '20px' }}>
+          <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>Mapa de rutas</p>
+          <MapaRutas tipo="pasajero" />
+        </div>
+
+        {/* Rutas disponibles */}
         <div style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '20px' }}>
           <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>Rutas disponibles</p>
           {rutas.length === 0 ? (
@@ -322,6 +331,7 @@ export default function PassengerDashboard() {
           )}
         </div>
 
+        {/* Mis reservas */}
         <div style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px' }}>
           <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>Mis reservas</p>
           {misReservas.length === 0 ? (

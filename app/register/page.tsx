@@ -32,15 +32,10 @@ export default function RegisterPage() {
     borderRadius: '8px', padding: '12px 16px', fontSize: '13px',
     color: '#1a1a1a', outline: 'none', fontFamily: sans, boxSizing: 'border-box',
   };
-  const labelStyle: React.CSSProperties = {
-    fontSize: '11px', color: '#9E9890', display: 'block',
-    marginBottom: '8px', fontFamily: sans, letterSpacing: '0.5px',
-  };
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', flex: 1, fontFamily: sans }}>
 
-      {/* Panel izquierdo */}
       <div style={{ width: '45%', background: '#1a1a1a', padding: '60px 56px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', bottom: '-80px', right: '-80px', width: '350px', height: '350px', borderRadius: '50%', border: '0.5px solid rgba(255,255,255,0.05)' }} />
         <div style={{ position: 'absolute', bottom: '-20px', right: '-20px', width: '220px', height: '220px', borderRadius: '50%', border: '0.5px solid rgba(255,255,255,0.07)' }} />
@@ -51,17 +46,17 @@ export default function RegisterPage() {
         </div>
 
         <div style={{ position: 'relative', zIndex: 1 }}>
-          <p style={{ fontSize: '11px', color: '#6b6b6b', letterSpacing: '2px', textTransform: 'uppercase' as const, marginBottom: '24px', fontFamily: sans }}>Únete a la comunidad</p>
+          <p style={{ fontSize: '11px', color: '#6b6b6b', letterSpacing: '2px', textTransform: 'uppercase' as const, marginBottom: '24px', fontFamily: sans }}>Unete a la comunidad</p>
           <h1 style={{ fontSize: '48px', fontWeight: 400, color: '#fff', lineHeight: 1.1, fontFamily: serif, marginBottom: '20px' }}>
             Empieza tu<br /><em style={{ fontStyle: 'italic', color: '#D6CCC2' }}>viaje</em>
           </h1>
           <p style={{ fontSize: '14px', color: '#6b6b6b', lineHeight: 1.7, fontFamily: sans, fontWeight: 300, maxWidth: '320px' }}>
-            Regístrate como conductor o pasajero y conecta con estudiantes de tu universidad.
+            Registrate como conductor o pasajero y conecta con estudiantes de tu universidad.
           </p>
         </div>
 
         <div style={{ display: 'flex', gap: '32px' }}>
-          {[{ v: '500+', l: 'Estudiantes' }, { v: '3', l: 'Universidades' }, { v: '10pts', l: 'Por viaje' }].map((s, i) => (
+          {[{ v: '100+', l: 'Estudiantes' }, { v: '16+', l: 'Universidades' }, { v: '10pts', l: 'Por viaje' }].map((s, i) => (
             <div key={i}>
               <p style={{ fontSize: '20px', fontWeight: 400, color: '#fff', fontFamily: serif, marginBottom: '4px' }}>{s.v}</p>
               <p style={{ fontSize: '11px', color: '#6b6b6b', fontFamily: sans }}>{s.l}</p>
@@ -70,7 +65,6 @@ export default function RegisterPage() {
         </div>
       </div>
 
-      {/* Panel derecho */}
       <div style={{ flex: 1, background: '#EDEDE9', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '60px' }}>
         <div style={{ width: '100%', maxWidth: '420px' }}>
           <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase' as const, marginBottom: '32px', fontFamily: sans }}>Crear cuenta</p>
@@ -82,25 +76,25 @@ export default function RegisterPage() {
           )}
 
           <div style={{ marginBottom: '16px' }}>
-            <label style={labelStyle}>Nombre completo</label>
+            <label style={{ fontSize: '11px', color: '#9E9890', display: 'block', marginBottom: '8px', fontFamily: sans }}>Nombre completo</label>
             <input type="text" placeholder="Tu nombre completo" style={inputStyle}
               value={form.nombre} onChange={e => setForm({ ...form, nombre: e.target.value })} />
           </div>
 
           <div style={{ marginBottom: '16px' }}>
-            <label style={labelStyle}>Correo electrónico</label>
+            <label style={{ fontSize: '11px', color: '#9E9890', display: 'block', marginBottom: '8px', fontFamily: sans }}>Correo electronico</label>
             <input type="email" placeholder="correo@universidad.edu.co" style={inputStyle}
               value={form.correo} onChange={e => setForm({ ...form, correo: e.target.value })} />
           </div>
 
           <div style={{ marginBottom: '16px' }}>
-            <label style={labelStyle}>Contraseña</label>
+            <label style={{ fontSize: '11px', color: '#9E9890', display: 'block', marginBottom: '8px', fontFamily: sans }}>Contraseña</label>
             <input type="password" placeholder="••••••••" style={inputStyle}
               value={form.contrasena} onChange={e => setForm({ ...form, contrasena: e.target.value })} />
           </div>
 
           <div style={{ marginBottom: '16px' }}>
-            <label style={labelStyle}>Perfil</label>
+            <label style={{ fontSize: '11px', color: '#9E9890', display: 'block', marginBottom: '8px', fontFamily: sans }}>Perfil</label>
             <select style={inputStyle} value={form.perfil} onChange={e => setForm({ ...form, perfil: e.target.value, tipo_conductor: '' })}>
               <option value="">Selecciona un perfil</option>
               <option value="pasajero">Pasajero</option>
@@ -110,19 +104,13 @@ export default function RegisterPage() {
 
           {form.perfil === 'conductor' && (
             <div style={{ marginBottom: '16px', background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '10px', padding: '16px' }}>
-              <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '1px', marginBottom: '12px', fontFamily: sans }}>¿Eres estudiante o docente?</p>
+              <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '1px', marginBottom: '12px', fontFamily: sans }}>Eres estudiante o docente?</p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                 {[{ v: 'estudiante', l: 'Estudiante', desc: 'Comparte el viaje con tus compañeros' }, { v: 'docente', l: 'Docente', desc: 'Ofrece rutas a los estudiantes' }].map(op => (
-                  <div key={op.v}
-                    onClick={() => setForm({ ...form, tipo_conductor: op.v })}
-                    style={{
-                      padding: '14px', borderRadius: '8px', cursor: 'pointer',
-                      background: form.tipo_conductor === op.v ? '#1a1a1a' : '#FAFAF8',
-                      border: `0.5px solid ${form.tipo_conductor === op.v ? '#1a1a1a' : '#D6CCC2'}`,
-                      transition: 'all 0.15s',
-                    }}>
+                  <div key={op.v} onClick={() => setForm({ ...form, tipo_conductor: op.v })}
+                    style={{ padding: '14px', borderRadius: '8px', cursor: 'pointer', background: form.tipo_conductor === op.v ? '#1a1a1a' : '#FAFAF8', border: `0.5px solid ${form.tipo_conductor === op.v ? '#1a1a1a' : '#D6CCC2'}`, transition: 'all 0.15s' }}>
                     <p style={{ fontSize: '13px', fontWeight: 500, color: form.tipo_conductor === op.v ? '#fff' : '#1a1a1a', marginBottom: '4px', fontFamily: sans }}>{op.l}</p>
-                    <p style={{ fontSize: '11px', color: form.tipo_conductor === op.v ? '#9E9890' : '#9E9890', fontFamily: sans }}>{op.desc}</p>
+                    <p style={{ fontSize: '11px', color: '#9E9890', fontFamily: sans }}>{op.desc}</p>
                   </div>
                 ))}
               </div>
@@ -130,7 +118,7 @@ export default function RegisterPage() {
           )}
 
           <div style={{ marginBottom: '32px' }}>
-            <label style={labelStyle}>Universidad</label>
+            <label style={{ fontSize: '11px', color: '#9E9890', display: 'block', marginBottom: '8px', fontFamily: sans }}>Universidad</label>
             <select style={inputStyle} value={form.universidad} onChange={e => setForm({ ...form, universidad: e.target.value })}>
               <option value="">Selecciona tu universidad</option>
               <optgroup label="Universidades">
@@ -138,20 +126,25 @@ export default function RegisterPage() {
                 <option value="Universidad Nacional de Colombia">Universidad Nacional</option>
                 <option value="Universidad EAFIT">Universidad EAFIT</option>
                 <option value="Universidad Pontificia Bolivariana">UPB</option>
-                <option value="Universidad de Medellín">Universidad de Medellín</option>
+                <option value="Universidad de Medellín">Universidad de Medellin</option>
                 <option value="Universidad CES">Universidad CES</option>
                 <option value="Universidad Cooperativa de Colombia">U. Cooperativa</option>
                 <option value="Universidad Autónoma Latinoamericana">UNAULA</option>
                 <option value="Universidad Remington">U. Remington</option>
                 <option value="Universidad San Buenaventura">U. San Buenaventura</option>
+                <option value="Universidad Católica Luis Amigó">U. Católica Luis Amigo</option>
+                <option value="Universidad Luis Amigó">Funlam</option>
+                <option value="Universitaria Agustiniana">Uniagustiniana</option>
               </optgroup>
-              <optgroup label="Tecnológicos">
-                <option value="Politécnico Colombiano Jaime Isaza Cadavid">Politécnico Colombiano</option>
+              <optgroup label="Tecnologicos e Institutos">
+                <option value="Politécnico Colombiano Jaime Isaza Cadavid">Politecnico Colombiano</option>
                 <option value="Instituto Tecnológico Metropolitano">ITM</option>
                 <option value="Institución Universitaria Pascual Bravo">Pascual Bravo</option>
                 <option value="Institución Universitaria Colegio Mayor">Colegio Mayor</option>
-                <option value="Tecnológico de Antioquia">Tecnológico de Antioquia</option>
+                <option value="Institución Universitaria Digital de Antioquia">Digital de Antioquia</option>
+                <option value="Tecnológico de Antioquia">Tecnologico de Antioquia</option>
                 <option value="SENA Regional Antioquia">SENA</option>
+                <option value="Escolme">Escolme</option>
               </optgroup>
             </select>
           </div>
@@ -162,8 +155,8 @@ export default function RegisterPage() {
           </button>
 
           <p style={{ textAlign: 'center' as const, fontSize: '13px', color: '#9E9890', fontFamily: sans }}>
-            ¿Ya tienes cuenta?{' '}
-            <a href="/login" style={{ color: '#1a1a1a', fontWeight: 500, textDecoration: 'none' }}>Inicia sesión</a>
+            Ya tienes cuenta?{' '}
+            <a href="/login" style={{ color: '#1a1a1a', fontWeight: 500, textDecoration: 'none' }}>Inicia sesion</a>
           </p>
         </div>
       </div>

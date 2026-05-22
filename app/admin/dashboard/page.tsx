@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import MapaRutas from '../../components/MapaRutas';
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({ total_usuarios: 0, total_vehiculos: 0, total_rutas: 0, viajes_completados: 0 });
@@ -27,7 +28,7 @@ export default function AdminDashboard() {
   };
 
   const handleEliminar = async (tipo: string, id: number, nombre: string) => {
-    if (!confirm(`¿Eliminar ${nombre}? Esta acción no se puede deshacer.`)) return;
+    if (!confirm(`Eliminar ${nombre}? Esta accion no se puede deshacer.`)) return;
     setMensaje(''); setError('');
     const res = await fetch(`/api/admin?tipo=${tipo}&id=${id}`, { method: 'DELETE' });
     const data = await res.json();
@@ -59,16 +60,14 @@ export default function AdminDashboard() {
   return (
     <div style={{ background: '#EDEDE9', minHeight: '100vh', flex: 1, fontFamily: sans }}>
 
-      {/* Navbar */}
       <div style={{ background: '#1a1a1a', padding: '0 40px', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span style={{ fontSize: '14px', fontWeight: 500, color: '#fff', fontFamily: sans }}>CarPoolDrive — Admin</span>
         <button onClick={() => { localStorage.removeItem('usuario'); window.location.href = '/login'; }}
           style={{ fontSize: '12px', color: '#9E9890', background: 'none', border: '0.5px solid #3a3a3a', borderRadius: '6px', padding: '7px 16px', cursor: 'pointer', fontFamily: sans }}>
-          Cerrar sesión
+          Cerrar sesion
         </button>
       </div>
 
-      {/* Hero */}
       <div style={{ background: '#1a1a1a', padding: '52px 40px 60px', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: '-100px', right: '-100px', width: '500px', height: '500px', borderRadius: '50%', border: '0.5px solid rgba(255,255,255,0.04)' }} />
         <div style={{ position: 'absolute', top: '-40px', right: '-40px', width: '350px', height: '350px', borderRadius: '50%', border: '0.5px solid rgba(255,255,255,0.06)' }} />
@@ -79,11 +78,10 @@ export default function AdminDashboard() {
             Vista <em style={{ fontStyle: 'italic', color: '#D6CCC2' }}>general</em>
           </h1>
 
-          {/* Stats */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1px', background: 'rgba(255,255,255,0.08)', borderRadius: '14px', overflow: 'hidden' }}>
             {[
               { label: 'Usuarios', value: stats.total_usuarios, key: 'usuarios' },
-              { label: 'Vehículos', value: stats.total_vehiculos, key: 'vehiculos' },
+              { label: 'Vehiculos', value: stats.total_vehiculos, key: 'vehiculos' },
               { label: 'Rutas', value: stats.total_rutas, key: 'rutas' },
               { label: 'Viajes completados', value: stats.viajes_completados, key: null },
             ].map((stat, i) => (
@@ -104,11 +102,17 @@ export default function AdminDashboard() {
         {mensaje && <div style={{ background: '#1a1a1a', color: '#D6CCC2', borderRadius: '10px', padding: '14px 20px', fontSize: '13px', marginBottom: '24px', fontFamily: sans }}>✓ {mensaje}</div>}
         {error && <div style={{ background: '#fee2e2', color: '#991b1b', borderRadius: '10px', padding: '14px 20px', fontSize: '13px', marginBottom: '24px', fontFamily: sans }}>{error}</div>}
 
+        {/* Mapa */}
+        <div style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '24px' }}>
+          <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>Mapa de todas las rutas activas</p>
+          <MapaRutas tipo="admin" />
+        </div>
+
         {/* Botones */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '24px' }}>
           {[
             { key: 'usuarios', label: 'Gestionar usuarios' },
-            { key: 'vehiculos', label: 'Gestionar vehículos' },
+            { key: 'vehiculos', label: 'Gestionar vehiculos' },
             { key: 'rutas', label: 'Gestionar rutas' },
           ].map(btn => (
             <button key={btn.key}
@@ -130,7 +134,7 @@ export default function AdminDashboard() {
         {tab && (
           <div style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px' }}>
             <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>
-              {tab === 'usuarios' ? 'Usuarios' : tab === 'vehiculos' ? 'Vehículos' : 'Rutas'}
+              {tab === 'usuarios' ? 'Usuarios' : tab === 'vehiculos' ? 'Vehiculos' : 'Rutas'}
             </p>
 
             {datos.length === 0 ? (
@@ -138,10 +142,7 @@ export default function AdminDashboard() {
             ) : tab === 'usuarios' ? (
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
-                  <tr>
-                    <th style={th}>ID</th><th style={th}>Nombre</th><th style={th}>Correo</th>
-                    <th style={th}>Perfil</th><th style={th}>Universidad</th><th style={th}>Acción</th>
-                  </tr>
+                  <tr><th style={th}>ID</th><th style={th}>Nombre</th><th style={th}>Correo</th><th style={th}>Perfil</th><th style={th}>Universidad</th><th style={th}>Accion</th></tr>
                 </thead>
                 <tbody>
                   {datos.map((u: any) => (
@@ -164,10 +165,7 @@ export default function AdminDashboard() {
             ) : tab === 'vehiculos' ? (
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
-                  <tr>
-                    <th style={th}>ID</th><th style={th}>Conductor</th><th style={th}>Placa</th>
-                    <th style={th}>Vehículo</th><th style={th}>Color</th><th style={th}>Puestos</th><th style={th}>Acción</th>
-                  </tr>
+                  <tr><th style={th}>ID</th><th style={th}>Conductor</th><th style={th}>Placa</th><th style={th}>Vehiculo</th><th style={th}>Color</th><th style={th}>Puestos</th><th style={th}>Accion</th></tr>
                 </thead>
                 <tbody>
                   {datos.map((v: any) => (
@@ -191,11 +189,7 @@ export default function AdminDashboard() {
             ) : (
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
-                  <tr>
-                    <th style={th}>ID</th><th style={th}>Conductor</th><th style={th}>Origen</th>
-                    <th style={th}>Destino</th><th style={th}>Hora</th><th style={th}>Estado</th>
-                    <th style={th}>Reservas</th><th style={th}>Acción</th>
-                  </tr>
+                  <tr><th style={th}>ID</th><th style={th}>Conductor</th><th style={th}>Origen</th><th style={th}>Destino</th><th style={th}>Hora</th><th style={th}>Estado</th><th style={th}>Reservas</th><th style={th}>Accion</th></tr>
                 </thead>
                 <tbody>
                   {datos.map((r: any) => (
