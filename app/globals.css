@@ -54,7 +54,7 @@ body {
   }
 
   .reserva-card {
-    grid-template-columns: 1fr 1fr !important;
+    grid-template-columns: 1fr !important;
     gap: 8px !important;
   }
 
