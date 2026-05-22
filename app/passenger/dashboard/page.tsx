@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import MapaRutas from '../../components/MapaRutas';
 import Chat from '../../components/Chat';
+import Notificaciones from '../../components/Notificaciones';
 
 export default function PassengerDashboard() {
   const [usuario, setUsuario] = useState<any>(null);
@@ -204,10 +205,13 @@ export default function PassengerDashboard() {
 
       <div className="navbar" style={{ background: '#1a1a1a', padding: '0 40px', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span style={{ fontSize: '14px', fontWeight: 500, color: '#fff', fontFamily: sans }}>CarPoolDrive — Pasajero</span>
-        <button onClick={() => { localStorage.removeItem('usuario'); window.location.href = '/login'; }}
-          style={{ fontSize: '12px', color: '#9E9890', background: 'none', border: '0.5px solid #3a3a3a', borderRadius: '6px', padding: '7px 16px', cursor: 'pointer', fontFamily: sans }}>
-          Cerrar sesion
-        </button>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          {usuario?.id && <Notificaciones usuario_id={usuario.id} />}
+          <button onClick={() => { localStorage.removeItem('usuario'); window.location.href = '/login'; }}
+            style={{ fontSize: '12px', color: '#9E9890', background: 'none', border: '0.5px solid #3a3a3a', borderRadius: '6px', padding: '7px 16px', cursor: 'pointer', fontFamily: sans }}>
+            Cerrar sesion
+          </button>
+        </div>
       </div>
 
       <div className="hero-section" style={{ background: '#1a1a1a', padding: '52px 40px 60px', position: 'relative', overflow: 'hidden' }}>
@@ -268,7 +272,6 @@ export default function PassengerDashboard() {
         {mensaje && <div style={{ background: '#1a1a1a', color: '#D6CCC2', borderRadius: '10px', padding: '14px 20px', fontSize: '13px', marginBottom: '24px', fontFamily: sans }}>{mensaje}</div>}
         {error && <div style={{ background: '#fee2e2', color: '#991b1b', borderRadius: '10px', padding: '14px 20px', fontSize: '13px', marginBottom: '24px', fontFamily: sans }}>{error}</div>}
 
-        {/* Buscar ruta */}
         <div className="card" style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '20px' }}>
           <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>Buscar ruta</p>
           <div className="buscar-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '16px', alignItems: 'flex-end' }}>
@@ -291,13 +294,11 @@ export default function PassengerDashboard() {
           </div>
         </div>
 
-        {/* Mapa */}
         <div className="card" style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '20px' }}>
           <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>Mapa de rutas</p>
           <MapaRutas tipo="pasajero" />
         </div>
 
-        {/* Rutas disponibles */}
         <div className="card" style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '20px' }}>
           <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>Rutas disponibles</p>
           {rutas.length === 0 ? (
@@ -344,7 +345,6 @@ export default function PassengerDashboard() {
           )}
         </div>
 
-        {/* Mis reservas */}
         <div className="card" style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px' }}>
           <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>Mis reservas</p>
           {misReservas.length === 0 ? (

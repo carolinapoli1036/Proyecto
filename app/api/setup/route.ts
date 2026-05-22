@@ -4,17 +4,16 @@ import db from '@/lib/db';
 export async function GET() {
   try {
     await db.execute(`
-      CREATE TABLE IF NOT EXISTS mensajes (
+      CREATE TABLE IF NOT EXISTS notificaciones (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        reserva_id INT NOT NULL,
-        remitente_id INT NOT NULL,
+        usuario_id INT NOT NULL,
         mensaje TEXT NOT NULL,
+        leida TINYINT DEFAULT 0,
         creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (reserva_id) REFERENCES reservas(id),
-        FOREIGN KEY (remitente_id) REFERENCES usuarios(id)
+        FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
       )
     `);
-    return NextResponse.json({ mensaje: 'Tabla mensajes creada correctamente' });
+    return NextResponse.json({ mensaje: 'Tabla notificaciones creada correctamente' });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

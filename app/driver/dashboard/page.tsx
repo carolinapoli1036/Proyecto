@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import MapaRutas from '../../components/MapaRutas';
 import Chat from '../../components/Chat';
+import Notificaciones from '../../components/Notificaciones';
 
 export default function DriverDashboard() {
   const [usuario, setUsuario] = useState<any>(null);
@@ -252,13 +253,16 @@ export default function DriverDashboard() {
         />
       )}
 
-      <div className="navbar" style={{ background: '#1a1a1a', padding: '0 40px', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ fontSize: '14px', fontWeight: 500, color: '#fff', fontFamily: sans }}>CarPoolDrive — Conductor</span>
-        <button onClick={() => { localStorage.removeItem('usuario'); window.location.href = '/login'; }}
-          style={{ fontSize: '12px', color: '#9E9890', background: 'none', border: '0.5px solid #3a3a3a', borderRadius: '6px', padding: '7px 16px', cursor: 'pointer', fontFamily: sans }}>
-          Cerrar sesion
-        </button>
-      </div>
+     <div className="navbar" style={{ background: '#1a1a1a', padding: '0 40px', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+  <span style={{ fontSize: '14px', fontWeight: 500, color: '#fff', fontFamily: sans }}>CarPoolDrive — Conductor</span>
+  <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+    {usuario?.id && <Notificaciones usuario_id={usuario.id} />}
+    <button onClick={() => { localStorage.removeItem('usuario'); window.location.href = '/login'; }}
+      style={{ fontSize: '12px', color: '#9E9890', background: 'none', border: '0.5px solid #3a3a3a', borderRadius: '6px', padding: '7px 16px', cursor: 'pointer', fontFamily: sans }}>
+      Cerrar sesion
+    </button>
+  </div>
+</div>
 
       <div className="hero-section" style={{ background: '#1a1a1a', padding: '52px 40px 60px', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', top: '-100px', right: '-100px', width: '500px', height: '500px', borderRadius: '50%', border: '0.5px solid rgba(255,255,255,0.04)' }} />
