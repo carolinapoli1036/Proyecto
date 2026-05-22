@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import MapaRutas from '../../components/MapaRutas';
+import Chat from '../../components/Chat';
 
 export default function DriverDashboard() {
   const [usuario, setUsuario] = useState<any>(null);
@@ -11,6 +12,9 @@ export default function DriverDashboard() {
   const [mensajeVehiculo, setMensajeVehiculo] = useState('');
   const [errorVehiculo, setErrorVehiculo] = useState('');
   const [mostrarFormVehiculo, setMostrarFormVehiculo] = useState(false);
+  const [reservasPorRuta, setReservasPorRuta] = useState<Record<number, any[]>>({});
+  const [rutaExpandida, setRutaExpandida] = useState<number | null>(null);
+  const [chatReserva, setChatReserva] = useState<any>(null);
 
   const [formRuta, setFormRuta] = useState({
     tipo_origen: '', origen: '', destino: '', hora_salida: '', puestos: 4, fecha: '',
@@ -44,6 +48,23 @@ export default function DriverDashboard() {
     const res = await fetch(`/api/vehiculos?conductor_id=${conductor_id}`);
     const data = await res.json();
     setVehiculo(data);
+  };
+
+  const cargarReservasDeRuta = async (ruta_id: number) => {
+    const res = await fetch(`/api/reservas/ruta?ruta_id=${ruta_id}`);
+    const data = await res.json();
+    if (Array.isArray(data)) {
+      setReservasPorRuta(prev => ({ ...prev, [ruta_id]: data }));
+    }
+  };
+
+  const handleExpandirRuta = (ruta_id: number) => {
+    if (rutaExpandida === ruta_id) {
+      setRutaExpandida(null);
+    } else {
+      setRutaExpandida(ruta_id);
+      cargarReservasDeRuta(ruta_id);
+    }
   };
 
   const handlePublicar = async () => {
@@ -220,6 +241,17 @@ export default function DriverDashboard() {
         }
       `}</style>
 
+      {chatReserva && usuario && (
+        <Chat
+          reserva_id={chatReserva.id}
+          usuario_id={usuario.id}
+          usuario_nombre={usuario.nombre}
+          conductor_nombre={chatReserva.pasajero_nombre}
+          ruta={`${chatReserva.origen} → ${chatReserva.destino}`}
+          onCerrar={() => setChatReserva(null)}
+        />
+      )}
+
       <div className="navbar" style={{ background: '#1a1a1a', padding: '0 40px', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span style={{ fontSize: '14px', fontWeight: 500, color: '#fff', fontFamily: sans }}>CarPoolDrive — Conductor</span>
         <button onClick={() => { localStorage.removeItem('usuario'); window.location.href = '/login'; }}
@@ -384,7 +416,7 @@ export default function DriverDashboard() {
         {/* Mapa */}
         <div className="card" style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '20px' }}>
           <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>Mapa de mis rutas</p>
-          <MapaRutas tipo="conductor" usuario_id={usuario?.id} />
+          {usuario?.id && <MapaRutas tipo="conductor" usuario_id={usuario.id} />}
         </div>
 
         {/* Mis rutas */}
@@ -395,36 +427,70 @@ export default function DriverDashboard() {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {rutas.map((ruta: any) => (
-                <div className="ruta-row" key={ruta.id} style={{ display: 'grid', gridTemplateColumns: '1.5fr 1.5fr 100px 80px 80px auto auto', gap: '16px', alignItems: 'center', padding: '18px 20px', background: '#FAFAF8', border: '0.5px solid #EDEDE9', borderRadius: '10px' }}>
-                  <div>
-                    <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>ORIGEN</p>
-                    <p style={{ fontSize: '13px', color: '#1a1a1a', fontWeight: 500, fontFamily: sans }}>{ruta.origen}</p>
-                  </div>
-                  <div>
-                    <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>DESTINO</p>
-                    <p style={{ fontSize: '13px', color: '#1a1a1a', fontWeight: 500, fontFamily: sans }}>{ruta.destino}</p>
-                  </div>
-                  <div>
-                    <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>FECHA</p>
-                    <p style={{ fontSize: '13px', color: '#1a1a1a', fontFamily: sans }}>{formatFecha(ruta.fecha)}</p>
-                  </div>
-                  <div>
-                    <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>HORA</p>
-                    <p style={{ fontSize: '13px', color: '#1a1a1a', fontFamily: serif }}>{ruta.hora_salida}</p>
-                  </div>
-                  <div>
-                    <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>PUESTOS</p>
-                    <p style={{ fontSize: '13px', color: '#1a1a1a', fontFamily: sans }}>{ruta.puestos_disponibles}/{ruta.puestos_totales}</p>
-                  </div>
-                  <div>{badgeEstado(ruta.estado)}</div>
-                  <div>
-                    {ruta.estado === 'activa' && (
-                      <button onClick={() => handleCompletarRuta(ruta.id)}
-                        style={{ background: '#EDEDE9', color: '#1a1a1a', border: '0.5px solid #D6CCC2', borderRadius: '8px', padding: '7px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: sans, whiteSpace: 'nowrap' }}>
-                        Completar viaje
+                <div key={ruta.id}>
+                  <div className="ruta-row" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1.5fr 100px 80px 80px auto auto auto', gap: '16px', alignItems: 'center', padding: '18px 20px', background: '#FAFAF8', border: '0.5px solid #EDEDE9', borderRadius: rutaExpandida === ruta.id ? '10px 10px 0 0' : '10px' }}>
+                    <div>
+                      <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>ORIGEN</p>
+                      <p style={{ fontSize: '13px', color: '#1a1a1a', fontWeight: 500, fontFamily: sans }}>{ruta.origen}</p>
+                    </div>
+                    <div>
+                      <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>DESTINO</p>
+                      <p style={{ fontSize: '13px', color: '#1a1a1a', fontWeight: 500, fontFamily: sans }}>{ruta.destino}</p>
+                    </div>
+                    <div>
+                      <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>FECHA</p>
+                      <p style={{ fontSize: '13px', color: '#1a1a1a', fontFamily: sans }}>{formatFecha(ruta.fecha)}</p>
+                    </div>
+                    <div>
+                      <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>HORA</p>
+                      <p style={{ fontSize: '13px', color: '#1a1a1a', fontFamily: serif }}>{ruta.hora_salida}</p>
+                    </div>
+                    <div>
+                      <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>PUESTOS</p>
+                      <p style={{ fontSize: '13px', color: '#1a1a1a', fontFamily: sans }}>{ruta.puestos_disponibles}/{ruta.puestos_totales}</p>
+                    </div>
+                    <div>{badgeEstado(ruta.estado)}</div>
+                    <div>
+                      {ruta.estado === 'activa' && (
+                        <button onClick={() => handleCompletarRuta(ruta.id)}
+                          style={{ background: '#EDEDE9', color: '#1a1a1a', border: '0.5px solid #D6CCC2', borderRadius: '8px', padding: '7px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: sans, whiteSpace: 'nowrap' }}>
+                          Completar
+                        </button>
+                      )}
+                    </div>
+                    <div>
+                      <button onClick={() => handleExpandirRuta(ruta.id)}
+                        style={{ background: rutaExpandida === ruta.id ? '#1a1a1a' : '#EDEDE9', color: rutaExpandida === ruta.id ? '#fff' : '#1a1a1a', border: '0.5px solid #D6CCC2', borderRadius: '8px', padding: '7px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: sans, whiteSpace: 'nowrap' }}>
+                        {rutaExpandida === ruta.id ? 'Cerrar' : 'Pasajeros'}
                       </button>
-                    )}
+                    </div>
                   </div>
+
+                  {rutaExpandida === ruta.id && (
+                    <div style={{ background: '#F5F5F0', border: '0.5px solid #EDEDE9', borderTop: 'none', borderRadius: '0 0 10px 10px', padding: '16px 20px' }}>
+                      {!reservasPorRuta[ruta.id] ? (
+                        <p style={{ fontSize: '12px', color: '#9E9890', fontFamily: sans }}>Cargando...</p>
+                      ) : reservasPorRuta[ruta.id].length === 0 ? (
+                        <p style={{ fontSize: '12px', color: '#9E9890', fontFamily: sans }}>No hay pasajeros en esta ruta.</p>
+                      ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                          <p style={{ fontSize: '10px', color: '#9E9890', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px', fontFamily: sans }}>Pasajeros</p>
+                          {reservasPorRuta[ruta.id].map((res: any) => (
+                            <div key={res.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff', border: '0.5px solid #EDEDE9', borderRadius: '8px', padding: '10px 16px' }}>
+                              <div>
+                                <p style={{ fontSize: '13px', color: '#1a1a1a', fontWeight: 500, fontFamily: sans }}>{res.pasajero_nombre}</p>
+                                <p style={{ fontSize: '11px', color: '#9E9890', fontFamily: sans }}>{res.estado}</p>
+                              </div>
+                              <button onClick={() => setChatReserva({ ...res, origen: ruta.origen, destino: ruta.destino })}
+                                style={{ background: '#1a1a1a', color: '#fff', border: 'none', borderRadius: '8px', padding: '7px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: sans }}>
+                                💬 Chat
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

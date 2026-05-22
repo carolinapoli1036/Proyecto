@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import MapaRutas from '../../components/MapaRutas';
+import Chat from '../../components/Chat';
 
 export default function PassengerDashboard() {
   const [usuario, setUsuario] = useState<any>(null);
@@ -10,6 +11,7 @@ export default function PassengerDashboard() {
   const [mensaje, setMensaje] = useState('');
   const [error, setError] = useState('');
   const [filtro, setFiltro] = useState({ origen: '', destino: '' });
+  const [chatReserva, setChatReserva] = useState<any>(null);
 
   const serif = "'DM Serif Display', Georgia, serif";
   const sans = "'DM Sans', system-ui, sans-serif";
@@ -189,20 +191,16 @@ export default function PassengerDashboard() {
   return (
     <div style={{ background: '#EDEDE9', minHeight: '100vh', flex: 1, fontFamily: sans }}>
 
-      <style>{`
-        @media (max-width: 768px) {
-          .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
-          .hero-section { padding: 32px 20px 40px !important; }
-          .hero-title { font-size: 32px !important; }
-          .dashboard-content { padding: 16px !important; }
-          .navbar { padding: 0 16px !important; }
-          .card { padding: 20px 16px !important; }
-          .buscar-grid { grid-template-columns: 1fr !important; }
-          .ruta-card { grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
-          .reserva-card { grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
-          .viaje-gratis-banner { flex-direction: column !important; gap: 10px !important; }
-        }
-      `}</style>
+      {chatReserva && (
+        <Chat
+          reserva_id={chatReserva.id}
+          usuario_id={usuario.id}
+          usuario_nombre={usuario.nombre}
+          conductor_nombre={chatReserva.conductor_nombre}
+          ruta={`${chatReserva.origen} → ${chatReserva.destino}`}
+          onCerrar={() => setChatReserva(null)}
+        />
+      )}
 
       <div className="navbar" style={{ background: '#1a1a1a', padding: '0 40px', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span style={{ fontSize: '14px', fontWeight: 500, color: '#fff', fontFamily: sans }}>CarPoolDrive — Pasajero</span>
@@ -354,10 +352,11 @@ export default function PassengerDashboard() {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {misReservas.map((reserva: any) => (
-                <div className="reserva-card" key={reserva.id} style={{ display: 'grid', gridTemplateColumns: '2fr 80px auto auto', gap: '16px', alignItems: 'center', padding: '18px 20px', background: '#FAFAF8', border: '0.5px solid #EDEDE9', borderRadius: '10px' }}>
+                <div className="reserva-card" key={reserva.id} style={{ display: 'grid', gridTemplateColumns: '2fr 80px auto auto auto', gap: '16px', alignItems: 'center', padding: '18px 20px', background: '#FAFAF8', border: '0.5px solid #EDEDE9', borderRadius: '10px' }}>
                   <div>
                     <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>RUTA</p>
                     <p style={{ fontSize: '13px', color: '#1a1a1a', fontWeight: 500, fontFamily: sans }}>{reserva.origen} → {reserva.destino}</p>
+                    <p style={{ fontSize: '11px', color: '#9E9890', marginTop: '2px', fontFamily: sans }}>Conductor: {reserva.conductor_nombre}</p>
                   </div>
                   <div>
                     <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>HORA</p>
@@ -367,8 +366,16 @@ export default function PassengerDashboard() {
                   <div>
                     {reserva.estado === 'confirmada' && (
                       <button onClick={() => handleCompletarViaje(reserva.id)}
-                        style={{ background: '#EDEDE9', color: '#1a1a1a', border: '0.5px solid #D6CCC2', borderRadius: '8px', padding: '8px 16px', fontSize: '12px', cursor: 'pointer', fontFamily: sans }}>
+                        style={{ background: '#EDEDE9', color: '#1a1a1a', border: '0.5px solid #D6CCC2', borderRadius: '8px', padding: '8px 16px', fontSize: '12px', cursor: 'pointer', fontFamily: sans, whiteSpace: 'nowrap' as const }}>
                         Completar viaje
+                      </button>
+                    )}
+                  </div>
+                  <div>
+                    {(reserva.estado === 'confirmada' || reserva.estado === 'completada') && (
+                      <button onClick={() => setChatReserva(reserva)}
+                        style={{ background: '#1a1a1a', color: '#fff', border: 'none', borderRadius: '8px', padding: '8px 16px', fontSize: '12px', cursor: 'pointer', fontFamily: sans, whiteSpace: 'nowrap' as const }}>
+                        💬 Chat
                       </button>
                     )}
                   </div>
