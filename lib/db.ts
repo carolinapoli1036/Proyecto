@@ -1,11 +1,11 @@
 import mysql from 'mysql2/promise';
 
 const db = mysql.createPool({
-  host: process.env.MYSQLHOST || 'kodama.proxy.rlwy.net',
-  user: process.env.MYSQLUSER || 'root',
-  password: process.env.MYSQLPASSWORD || 'fLjvMOboBFMpLaUnxeNKnCeWHAePbueG',
-  database: process.env.MYSQLDATABASE || 'railway',
-  port: parseInt(process.env.MYSQLPORT || '31334'),
+  host: process.env.MYSQLHOST,
+  user: process.env.MYSQLUSER,
+  password: process.env.MYSQLPASSWORD,
+  database: process.env.MYSQLDATABASE,
+  port: parseInt(process.env.MYSQLPORT || '3306'),
 });
 
 export default db;
