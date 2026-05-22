@@ -25,7 +25,6 @@ export default function Chat({ reserva_id, usuario_id, usuario_nombre, conductor
   const [enviando, setEnviando] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const sans = "'DM Sans', system-ui, sans-serif";
-  const serif = "'DM Serif Display', Georgia, serif";
 
   useEffect(() => {
     cargarMensajes();
@@ -56,13 +55,15 @@ export default function Chat({ reserva_id, usuario_id, usuario_nombre, conductor
     cargarMensajes();
   };
 
-  const formatHora = (fecha: string) => {
-  const d = new Date(fecha);
-  return d.toLocaleTimeString('es-CO', { 
-    hour: '2-digit', 
-    minute: '2-digit',
-    timeZone: 'America/Bogota'
-  });
+const formatHora = (fecha: string) => {
+  const partes = fecha.split('T')[1].split(':');
+  let h = parseInt(partes[0]);
+  const m = partes[1];
+  h = h - 10;
+  if (h < 0) h = h + 24;
+  const ampm = h >= 12 ? 'p. m.' : 'a. m.';
+  const h12 = (h % 12 || 12).toString();
+  return `${h12}:${m} ${ampm}`;
 };
   return (
     <div style={{
@@ -76,7 +77,6 @@ export default function Chat({ reserva_id, usuario_id, usuario_nombre, conductor
         boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
       }}>
 
-        {/* Header */}
         <div style={{ background: '#1a1a1a', padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div>
             <p style={{ fontSize: '13px', fontWeight: 500, color: '#fff', fontFamily: sans, marginBottom: '2px' }}>
@@ -90,7 +90,6 @@ export default function Chat({ reserva_id, usuario_id, usuario_nombre, conductor
           </button>
         </div>
 
-        {/* Mensajes */}
         <div style={{ flex: 1, overflowY: 'auto', padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {mensajes.length === 0 && (
             <div style={{ textAlign: 'center', padding: '40px 0' }}>
@@ -121,7 +120,6 @@ export default function Chat({ reserva_id, usuario_id, usuario_nombre, conductor
           <div ref={bottomRef} />
         </div>
 
-        {/* Input */}
         <div style={{ padding: '16px 20px', borderTop: '0.5px solid #EDEDE9', display: 'flex', gap: '12px', alignItems: 'center' }}>
           <input
             type="text"
