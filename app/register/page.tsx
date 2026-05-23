@@ -42,7 +42,7 @@ export default function RegisterPage() {
         <div style={{ position: 'absolute', top: '-60px', left: '-60px', width: '280px', height: '280px', borderRadius: '50%', border: '0.5px solid rgba(255,255,255,0.04)' }} />
 
         <div>
-          <a href="/" style={{ fontSize: '15px', fontWeight: 500, color: '#fff', textDecoration: 'none', fontFamily: sans }}>CarPoolDrive</a>
+          <a href="/" style={{ fontSize: '15px', fontWeight: 500, color: '#fff', textDecoration: 'none', fontFamily: sans }}>CARPODRIVE</a>
         </div>
 
         <div style={{ position: 'relative', zIndex: 1 }}>

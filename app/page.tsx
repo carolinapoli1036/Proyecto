@@ -6,7 +6,7 @@ export default function Home() {
     <div style={{ background: '#EDEDE9', minHeight: '100vh', flex: 1, fontFamily: sans, display: 'flex', flexDirection: 'column' }}>
 
       <div style={{ background: '#1a1a1a', padding: '0 48px', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ fontSize: '15px', fontWeight: 500, color: '#fff', fontFamily: sans, letterSpacing: '0.3px' }}>CarPoolDrive</span>
+        <span style={{ fontSize: '15px', fontWeight: 500, color: '#fff', fontFamily: sans, letterSpacing: '0.3px' }}>CARPODRIVE</span>
         <div style={{ display: 'flex', gap: '12px' }}>
           <a href="/login" style={{ fontSize: '13px', color: '#9E9890', textDecoration: 'none', padding: '7px 16px', border: '0.5px solid #3a3a3a', borderRadius: '6px' }}>
             Iniciar sesion

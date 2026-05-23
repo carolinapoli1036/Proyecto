@@ -74,7 +74,7 @@ export default function AdminDashboard() {
       `}</style>
 
       <div className="navbar" style={{ background: '#1a1a1a', padding: '0 40px', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ fontSize: '14px', fontWeight: 500, color: '#fff', fontFamily: sans }}>CarPoolDrive — Admin</span>
+        <span style={{ fontSize: '14px', fontWeight: 500, color: '#fff', fontFamily: sans }}>CARPODRIVE — Admin</span>
         <button onClick={() => { localStorage.removeItem('usuario'); window.location.href = '/login'; }}
           style={{ fontSize: '12px', color: '#9E9890', background: 'none', border: '0.5px solid #3a3a3a', borderRadius: '6px', padding: '7px 16px', cursor: 'pointer', fontFamily: sans }}>
           Cerrar sesion

@@ -3,7 +3,7 @@ import "./globals.css";
 import Sidebar from "./components/Sidebar";
 
 export const metadata: Metadata = {
-  title: "CarPoolDrive",
+  title: "CARPODRIVE",
   description: "Sistema de carpooling universitario",
 };
 

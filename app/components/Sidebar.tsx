@@ -31,7 +31,7 @@ export default function Sidebar() {
 
   const sidebarContent = (
     <>
-      <div style={{ fontSize: '16px', fontWeight: 600, color: '#fff', marginBottom: '24px', padding: '0 8px', fontFamily: sans }}>CarPoolDrive</div>
+      <div style={{ fontSize: '16px', fontWeight: 600, color: '#fff', marginBottom: '24px', padding: '0 8px', fontFamily: sans }}>CARPODRIVE</div>
 
       {perfil ? (
         <>

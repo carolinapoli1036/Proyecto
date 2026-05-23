@@ -204,7 +204,7 @@ export default function PassengerDashboard() {
       )}
 
       <div className="navbar" style={{ background: '#1a1a1a', padding: '0 40px', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ fontSize: '14px', fontWeight: 500, color: '#fff', fontFamily: sans }}>CarPoolDrive — Pasajero</span>
+        <span style={{ fontSize: '14px', fontWeight: 500, color: '#fff', fontFamily: sans }}>CARPODRIVE — Pasajero</span>
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
           {usuario?.id && <Notificaciones usuario_id={usuario.id} />}
           <button onClick={() => { localStorage.removeItem('usuario'); window.location.href = '/login'; }}

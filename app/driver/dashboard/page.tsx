@@ -254,7 +254,7 @@ export default function DriverDashboard() {
       )}
 
      <div className="navbar" style={{ background: '#1a1a1a', padding: '0 40px', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-  <span style={{ fontSize: '14px', fontWeight: 500, color: '#fff', fontFamily: sans }}>CarPoolDrive — Conductor</span>
+  <span style={{ fontSize: '14px', fontWeight: 500, color: '#fff', fontFamily: sans }}>CARPODRIVE — Conductor</span>
   <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
     {usuario?.id && <Notificaciones usuario_id={usuario.id} />}
     <button onClick={() => { localStorage.removeItem('usuario'); window.location.href = '/login'; }}
@@ -330,7 +330,7 @@ export default function DriverDashboard() {
           )}
           {rutasCompletadas >= 10 && (
             <div style={{ marginTop: '16px', background: 'rgba(251,191,36,0.1)', border: '0.5px solid #fbbf2440', borderRadius: '10px', padding: '12px 20px' }}>
-              <p style={{ fontSize: '13px', color: '#fbbf24', fontFamily: sans }}>Eres Conductor Elite. Gracias por ser parte de la comunidad CarPoolDrive.</p>
+              <p style={{ fontSize: '13px', color: '#fbbf24', fontFamily: sans }}>Eres Conductor Elite. Gracias por ser parte de la comunidad CARPODRIVE.</p>
             </div>
           )}
         </div>
