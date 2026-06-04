@@ -22,11 +22,16 @@ export default function PassengerDashboard() {
     if (data) {
       const user = JSON.parse(data);
       setUsuario(user);
+      expirarRutas();
       cargarRutas();
       cargarReservas(user.id);
       cargarPuntos(user.id);
     }
   }, []);
+
+  const expirarRutas = async () => {
+    await fetch('/api/rutas/expirar', { method: 'POST' });
+  };
 
   const cargarPuntos = async (usuario_id: number) => {
     const res = await fetch(`/api/usuarios/puntos?usuario_id=${usuario_id}`);
@@ -82,6 +87,22 @@ export default function PassengerDashboard() {
       }
       cargarReservas(usuario.id);
     } else { setError(data.error ?? 'Error al completar viaje'); }
+  };
+
+  const handleCancelarReserva = async (reserva_id: number) => {
+    if (!confirm('¿Segura que quieres cancelar esta reserva?')) return;
+    setMensaje(''); setError('');
+    const res = await fetch('/api/reservas/cancelar', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reserva_id }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      setMensaje('Reserva cancelada exitosamente');
+      cargarRutas();
+      cargarReservas(usuario.id);
+    } else { setError(data.error); }
   };
 
   const handleUsarViajeGratis = async (ruta_id: number) => {
@@ -204,7 +225,7 @@ export default function PassengerDashboard() {
       )}
 
       <div className="navbar" style={{ background: '#1a1a1a', padding: '0 40px', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <span style={{ fontSize: '14px', fontWeight: 500, color: '#fff', fontFamily: sans }}>CARPODRIVE — Pasajero</span>
+        <span style={{ fontSize: '14px', fontWeight: 500, color: '#fff', fontFamily: sans }}>CarpoDrive — Pasajero</span>
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
           {usuario?.id && <Notificaciones usuario_id={usuario.id} />}
           <button onClick={() => { localStorage.removeItem('usuario'); window.location.href = '/login'; }}
@@ -272,6 +293,7 @@ export default function PassengerDashboard() {
         {mensaje && <div style={{ background: '#1a1a1a', color: '#D6CCC2', borderRadius: '10px', padding: '14px 20px', fontSize: '13px', marginBottom: '24px', fontFamily: sans }}>{mensaje}</div>}
         {error && <div style={{ background: '#fee2e2', color: '#991b1b', borderRadius: '10px', padding: '14px 20px', fontSize: '13px', marginBottom: '24px', fontFamily: sans }}>{error}</div>}
 
+        {/* Buscar ruta */}
         <div className="card" style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '20px' }}>
           <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>Buscar ruta</p>
           <div className="buscar-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '16px', alignItems: 'flex-end' }}>
@@ -294,11 +316,13 @@ export default function PassengerDashboard() {
           </div>
         </div>
 
+        {/* Mapa */}
         <div className="card" style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '20px' }}>
           <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>Mapa de rutas</p>
           <MapaRutas tipo="pasajero" />
         </div>
 
+        {/* Rutas disponibles */}
         <div className="card" style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '20px' }}>
           <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>Rutas disponibles</p>
           {rutas.length === 0 ? (
@@ -345,6 +369,7 @@ export default function PassengerDashboard() {
           )}
         </div>
 
+        {/* Mis reservas */}
         <div className="card" style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px' }}>
           <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>Mis reservas</p>
           {misReservas.length === 0 ? (
@@ -352,7 +377,7 @@ export default function PassengerDashboard() {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {misReservas.map((reserva: any) => (
-                <div className="reserva-card" key={reserva.id} style={{ display: 'grid', gridTemplateColumns: '2fr 80px auto auto auto', gap: '16px', alignItems: 'center', padding: '18px 20px', background: '#FAFAF8', border: '0.5px solid #EDEDE9', borderRadius: '10px' }}>
+                <div className="reserva-card" key={reserva.id} style={{ display: 'grid', gridTemplateColumns: '2fr 80px auto auto auto auto', gap: '16px', alignItems: 'center', padding: '18px 20px', background: '#FAFAF8', border: '0.5px solid #EDEDE9', borderRadius: '10px' }}>
                   <div>
                     <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>RUTA</p>
                     <p style={{ fontSize: '13px', color: '#1a1a1a', fontWeight: 500, fontFamily: sans }}>{reserva.origen} → {reserva.destino}</p>
@@ -368,6 +393,14 @@ export default function PassengerDashboard() {
                       <button onClick={() => handleCompletarViaje(reserva.id)}
                         style={{ background: '#EDEDE9', color: '#1a1a1a', border: '0.5px solid #D6CCC2', borderRadius: '8px', padding: '8px 16px', fontSize: '12px', cursor: 'pointer', fontFamily: sans, whiteSpace: 'nowrap' as const }}>
                         Completar viaje
+                      </button>
+                    )}
+                  </div>
+                  <div>
+                    {reserva.estado === 'confirmada' && (
+                      <button onClick={() => handleCancelarReserva(reserva.id)}
+                        style={{ background: '#fee2e2', color: '#991b1b', border: 'none', borderRadius: '8px', padding: '8px 16px', fontSize: '12px', cursor: 'pointer', fontFamily: sans, whiteSpace: 'nowrap' as const }}>
+                        Cancelar
                       </button>
                     )}
                   </div>
