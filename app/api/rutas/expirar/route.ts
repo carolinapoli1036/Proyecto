@@ -8,7 +8,7 @@ export async function POST() {
       UPDATE rutas 
       SET estado = 'cancelada'
       WHERE estado = 'activa'
-      AND TIMESTAMP(fecha, hora_salida) < NOW() - INTERVAL 5 HOUR
+      AND TIMESTAMP(fecha, hora_salida) < NOW() + INTERVAL 5 HOUR
       AND id NOT IN (
         SELECT DISTINCT ruta_id FROM reservas WHERE estado = 'confirmada'
       )
@@ -21,40 +21,36 @@ export async function POST() {
       JOIN reservas res ON res.ruta_id = r.id
       WHERE r.estado = 'activa'
       AND res.estado = 'confirmada'
-      AND TIMESTAMP(r.fecha, r.hora_salida) < NOW() - INTERVAL 5 HOUR
+      AND TIMESTAMP(r.fecha, r.hora_salida) < NOW() + INTERVAL 5 HOUR
     `);
 
     for (const ruta of rutasExpiradas) {
-      // Marcar ruta como completada
       await db.execute(
         "UPDATE rutas SET estado = 'completada' WHERE id = ?",
         [ruta.id]
       );
 
-      // Obtener pasajeros de esa ruta
       const [reservas]: any = await db.execute(
         "SELECT * FROM reservas WHERE ruta_id = ? AND estado = 'confirmada'",
         [ruta.id]
       );
 
       for (const reserva of reservas) {
-        // Completar reserva
         await db.execute(
           "UPDATE reservas SET estado = 'completada' WHERE id = ?",
           [reserva.id]
         );
 
-        // Sumar 10 puntos al pasajero
         await db.execute(
           "UPDATE usuarios SET puntos = puntos + 10 WHERE id = ?",
           [reserva.pasajero_id]
         );
 
-        // Notificar al pasajero
         const [rutas]: any = await db.execute(
           "SELECT origen, destino FROM rutas WHERE id = ?",
           [ruta.id]
         );
+
         await db.execute(
           "INSERT INTO notificaciones (usuario_id, mensaje) VALUES (?, ?)",
           [reserva.pasajero_id, `Tu viaje ${rutas[0].origen} → ${rutas[0].destino} fue completado automáticamente. +10 puntos`]
