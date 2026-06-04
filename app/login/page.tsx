@@ -9,24 +9,45 @@ export default function LoginPage() {
   const serif = "'DM Serif Display', Georgia, serif";
   const sans = "'DM Sans', system-ui, sans-serif";
 
-  const handleLogin = async () => {
-    setError('');
-    const res = await fetch('/api/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ correo, contrasena }),
-    });
-    const data = await res.json();
-    if (res.ok) {
-      localStorage.setItem('usuario', JSON.stringify(data.usuario));
-      if (data.usuario.perfil === 'admin') window.location.href = '/admin/dashboard';
-      else if (data.usuario.perfil === 'conductor') window.location.href = '/driver/dashboard';
-      else window.location.href = '/passenger/dashboard';
-    } else {
-      setError(data.error);
-    }
-  };
+const handleLogin = async () => {
+  setError('');
 
+  if (!correo || !contrasena) {
+    setError('Por favor completa todos los campos'); return;
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(correo)) {
+    setError('El correo electrónico no es válido'); return;
+  }
+
+  if (contrasena.length < 8) {
+    setError('La contraseña debe tener al menos 8 caracteres'); return;
+  }
+
+  if (!/[A-Z]/.test(contrasena)) {
+    setError('La contraseña debe tener al menos una letra mayúscula'); return;
+  }
+
+  if (!/[0-9]/.test(contrasena)) {
+    setError('La contraseña debe tener al menos un número'); return;
+  }
+
+  const res = await fetch('/api/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ correo, contrasena }),
+  });
+  const data = await res.json();
+  if (res.ok) {
+    localStorage.setItem('usuario', JSON.stringify(data.usuario));
+    if (data.usuario.perfil === 'admin') window.location.href = '/admin/dashboard';
+    else if (data.usuario.perfil === 'conductor') window.location.href = '/driver/dashboard';
+    else window.location.href = '/passenger/dashboard';
+  } else {
+    setError(data.error);
+  }
+};
   return (
     <div style={{ display: 'flex', minHeight: '100vh', flex: 1, fontFamily: sans }}>
 
