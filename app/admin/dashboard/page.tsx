@@ -8,12 +8,16 @@ export default function AdminDashboard() {
   const [datos, setDatos] = useState<any[]>([]);
   const [mensaje, setMensaje] = useState('');
   const [error, setError] = useState('');
+  const [editando, setEditando] = useState<any>(null);
+  const [creando, setCreando] = useState(false);
+  const [formCrear, setFormCrear] = useState<any>({});
+  const [formEditar, setFormEditar] = useState<any>({});
 
   const serif = "'DM Serif Display', Georgia, serif";
   const sans = "'DM Sans', system-ui, sans-serif";
 
   useEffect(() => { cargarStats(); }, []);
-  useEffect(() => { if (tab) cargarDatos(tab); }, [tab]);
+  useEffect(() => { if (tab) { cargarDatos(tab); setEditando(null); setCreando(false); setFormCrear({}); } }, [tab]);
 
   const cargarStats = async () => {
     const res = await fetch('/api/admin?tipo=stats');
@@ -33,6 +37,38 @@ export default function AdminDashboard() {
     const res = await fetch(`/api/admin?tipo=${tipo}&id=${id}`, { method: 'DELETE' });
     const data = await res.json();
     if (res.ok) { setMensaje(data.mensaje); cargarStats(); if (tab) cargarDatos(tab); }
+    else { setError(data.error); }
+  };
+
+  const handleEditar = (item: any) => {
+    setEditando(item.id);
+    setFormEditar({ ...item });
+    setCreando(false);
+  };
+
+  const handleGuardarEdicion = async () => {
+    setMensaje(''); setError('');
+    const tipoSingular = tab === 'usuarios' ? 'usuario' : tab === 'vehiculos' ? 'vehiculo' : 'ruta';
+    const res = await fetch('/api/admin', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tipo: tipoSingular, id: editando, datos: formEditar }),
+    });
+    const data = await res.json();
+    if (res.ok) { setMensaje(data.mensaje); setEditando(null); if (tab) cargarDatos(tab); cargarStats(); }
+    else { setError(data.error); }
+  };
+
+  const handleCrear = async () => {
+    setMensaje(''); setError('');
+    const tipoSingular = tab === 'usuarios' ? 'usuario' : tab === 'vehiculos' ? 'vehiculo' : 'ruta';
+    const res = await fetch('/api/admin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tipo: tipoSingular, datos: formCrear }),
+    });
+    const data = await res.json();
+    if (res.ok) { setMensaje(data.mensaje); setCreando(false); setFormCrear({}); if (tab) cargarDatos(tab); cargarStats(); }
     else { setError(data.error); }
   };
 
@@ -56,6 +92,53 @@ export default function AdminDashboard() {
 
   const th: React.CSSProperties = { textAlign: 'left', padding: '10px 12px', fontSize: '10px', fontWeight: 500, letterSpacing: '1px', textTransform: 'uppercase', color: '#9E9890', borderBottom: '0.5px solid #D6CCC2', fontFamily: sans };
   const td: React.CSSProperties = { padding: '13px 12px', color: '#1a1a1a', borderBottom: '0.5px solid #EDEDE9', fontSize: '13px', fontFamily: sans };
+  const inputStyle: React.CSSProperties = { background: '#FAFAF8', border: '0.5px solid #D6CCC2', borderRadius: '6px', padding: '7px 10px', fontSize: '12px', color: '#1a1a1a', outline: 'none', fontFamily: sans, width: '100%', boxSizing: 'border-box' };
+
+  const formUsuario = (form: any, setForm: any) => (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '12px' }}>
+      <div><label style={{ fontSize: '10px', color: '#9E9890', display: 'block', marginBottom: '4px', fontFamily: sans }}>Nombre</label><input style={inputStyle} value={form.nombre || ''} onChange={e => setForm({ ...form, nombre: e.target.value })} /></div>
+      <div><label style={{ fontSize: '10px', color: '#9E9890', display: 'block', marginBottom: '4px', fontFamily: sans }}>Correo</label><input style={inputStyle} value={form.correo || ''} onChange={e => setForm({ ...form, correo: e.target.value })} /></div>
+      {!editando && <div><label style={{ fontSize: '10px', color: '#9E9890', display: 'block', marginBottom: '4px', fontFamily: sans }}>Contraseña</label><input type="password" style={inputStyle} value={form.contrasena || ''} onChange={e => setForm({ ...form, contrasena: e.target.value })} /></div>}
+      <div><label style={{ fontSize: '10px', color: '#9E9890', display: 'block', marginBottom: '4px', fontFamily: sans }}>Perfil</label>
+        <select style={inputStyle} value={form.perfil || ''} onChange={e => setForm({ ...form, perfil: e.target.value })}>
+          <option value="">Selecciona</option>
+          <option value="pasajero">Pasajero</option>
+          <option value="conductor">Conductor</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <div><label style={{ fontSize: '10px', color: '#9E9890', display: 'block', marginBottom: '4px', fontFamily: sans }}>Universidad</label><input style={inputStyle} value={form.universidad || ''} onChange={e => setForm({ ...form, universidad: e.target.value })} /></div>
+    </div>
+  );
+
+  const formVehiculo = (form: any, setForm: any) => (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '12px' }}>
+      {creando && <div><label style={{ fontSize: '10px', color: '#9E9890', display: 'block', marginBottom: '4px', fontFamily: sans }}>ID Conductor</label><input style={inputStyle} value={form.conductor_id || ''} onChange={e => setForm({ ...form, conductor_id: e.target.value })} /></div>}
+      <div><label style={{ fontSize: '10px', color: '#9E9890', display: 'block', marginBottom: '4px', fontFamily: sans }}>Placa</label><input style={inputStyle} value={form.placa || ''} onChange={e => setForm({ ...form, placa: e.target.value })} /></div>
+      <div><label style={{ fontSize: '10px', color: '#9E9890', display: 'block', marginBottom: '4px', fontFamily: sans }}>Marca</label><input style={inputStyle} value={form.marca || ''} onChange={e => setForm({ ...form, marca: e.target.value })} /></div>
+      <div><label style={{ fontSize: '10px', color: '#9E9890', display: 'block', marginBottom: '4px', fontFamily: sans }}>Modelo</label><input style={inputStyle} value={form.modelo || ''} onChange={e => setForm({ ...form, modelo: e.target.value })} /></div>
+      <div><label style={{ fontSize: '10px', color: '#9E9890', display: 'block', marginBottom: '4px', fontFamily: sans }}>Color</label><input style={inputStyle} value={form.color || ''} onChange={e => setForm({ ...form, color: e.target.value })} /></div>
+      <div><label style={{ fontSize: '10px', color: '#9E9890', display: 'block', marginBottom: '4px', fontFamily: sans }}>Puestos</label><input type="number" min="1" max="8" style={inputStyle} value={form.puestos || ''} onChange={e => setForm({ ...form, puestos: e.target.value })} /></div>
+    </div>
+  );
+
+  const formRuta = (form: any, setForm: any) => (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '12px' }}>
+      {creando && <div><label style={{ fontSize: '10px', color: '#9E9890', display: 'block', marginBottom: '4px', fontFamily: sans }}>ID Conductor</label><input style={inputStyle} value={form.conductor_id || ''} onChange={e => setForm({ ...form, conductor_id: e.target.value })} /></div>}
+      <div><label style={{ fontSize: '10px', color: '#9E9890', display: 'block', marginBottom: '4px', fontFamily: sans }}>Origen</label><input style={inputStyle} value={form.origen || ''} onChange={e => setForm({ ...form, origen: e.target.value })} /></div>
+      <div><label style={{ fontSize: '10px', color: '#9E9890', display: 'block', marginBottom: '4px', fontFamily: sans }}>Destino</label><input style={inputStyle} value={form.destino || ''} onChange={e => setForm({ ...form, destino: e.target.value })} /></div>
+      <div><label style={{ fontSize: '10px', color: '#9E9890', display: 'block', marginBottom: '4px', fontFamily: sans }}>Fecha</label><input type="date" style={inputStyle} value={form.fecha ? form.fecha.split('T')[0] : ''} onChange={e => setForm({ ...form, fecha: e.target.value })} /></div>
+      <div><label style={{ fontSize: '10px', color: '#9E9890', display: 'block', marginBottom: '4px', fontFamily: sans }}>Hora</label><input type="time" style={inputStyle} value={form.hora_salida || ''} onChange={e => setForm({ ...form, hora_salida: e.target.value })} /></div>
+      {!creando && <div><label style={{ fontSize: '10px', color: '#9E9890', display: 'block', marginBottom: '4px', fontFamily: sans }}>Estado</label>
+        <select style={inputStyle} value={form.estado || ''} onChange={e => setForm({ ...form, estado: e.target.value })}>
+          <option value="activa">Activa</option>
+          <option value="completada">Completada</option>
+          <option value="cancelada">Cancelada</option>
+        </select>
+      </div>}
+      {creando && <div><label style={{ fontSize: '10px', color: '#9E9890', display: 'block', marginBottom: '4px', fontFamily: sans }}>Puestos</label><input type="number" min="1" max="8" style={inputStyle} value={form.puestos || ''} onChange={e => setForm({ ...form, puestos: e.target.value })} /></div>}
+    </div>
+  );
 
   return (
     <div style={{ background: '#EDEDE9', minHeight: '100vh', flex: 1, fontFamily: sans }}>
@@ -115,13 +198,11 @@ export default function AdminDashboard() {
         {mensaje && <div style={{ background: '#1a1a1a', color: '#D6CCC2', borderRadius: '10px', padding: '14px 20px', fontSize: '13px', marginBottom: '24px', fontFamily: sans }}>✓ {mensaje}</div>}
         {error && <div style={{ background: '#fee2e2', color: '#991b1b', borderRadius: '10px', padding: '14px 20px', fontSize: '13px', marginBottom: '24px', fontFamily: sans }}>{error}</div>}
 
-        {/* Mapa */}
         <div className="card" style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '24px' }}>
           <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>Mapa de todas las rutas activas</p>
           <MapaRutas tipo="admin" />
         </div>
 
-        {/* Botones */}
         <div className="botones-admin" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '24px' }}>
           {[
             { key: 'usuarios', label: 'Gestionar usuarios' },
@@ -143,12 +224,38 @@ export default function AdminDashboard() {
           ))}
         </div>
 
-        {/* Tabla */}
         {tab && (
           <div className="card" style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px' }}>
-            <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>
-              {tab === 'usuarios' ? 'Usuarios' : tab === 'vehiculos' ? 'Vehiculos' : 'Rutas'}
-            </p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '22px' }}>
+              <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', fontFamily: sans }}>
+                {tab === 'usuarios' ? 'Usuarios' : tab === 'vehiculos' ? 'Vehiculos' : 'Rutas'}
+              </p>
+              <button onClick={() => { setCreando(!creando); setEditando(null); setFormCrear({}); }}
+                style={{ background: creando ? '#EDEDE9' : '#1a1a1a', color: creando ? '#1a1a1a' : '#fff', border: 'none', borderRadius: '8px', padding: '8px 16px', fontSize: '12px', cursor: 'pointer', fontFamily: sans }}>
+                {creando ? 'Cancelar' : `+ Crear ${tab === 'usuarios' ? 'usuario' : tab === 'vehiculos' ? 'vehiculo' : 'ruta'}`}
+              </button>
+            </div>
+
+            {creando && (
+              <div style={{ background: '#FAFAF8', border: '0.5px solid #D6CCC2', borderRadius: '12px', padding: '20px', marginBottom: '20px' }}>
+                <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '16px', fontFamily: sans }}>
+                  Nuevo {tab === 'usuarios' ? 'usuario' : tab === 'vehiculos' ? 'vehiculo' : 'ruta'}
+                </p>
+                {tab === 'usuarios' && formUsuario(formCrear, setFormCrear)}
+                {tab === 'vehiculos' && formVehiculo(formCrear, setFormCrear)}
+                {tab === 'rutas' && formRuta(formCrear, setFormCrear)}
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button onClick={handleCrear}
+                    style={{ background: '#1a1a1a', color: '#fff', border: 'none', borderRadius: '8px', padding: '9px 20px', fontSize: '12px', cursor: 'pointer', fontFamily: sans }}>
+                    Guardar
+                  </button>
+                  <button onClick={() => { setCreando(false); setFormCrear({}); }}
+                    style={{ background: '#EDEDE9', color: '#1a1a1a', border: 'none', borderRadius: '8px', padding: '9px 20px', fontSize: '12px', cursor: 'pointer', fontFamily: sans }}>
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            )}
 
             {datos.length === 0 ? (
               <p style={{ color: '#9E9890', fontSize: '13px', textAlign: 'center', padding: '32px 0', fontFamily: sans }}>No hay datos.</p>
@@ -157,72 +264,147 @@ export default function AdminDashboard() {
                 {tab === 'usuarios' ? (
                   <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }}>
                     <thead>
-                      <tr><th style={th}>ID</th><th style={th}>Nombre</th><th style={th}>Correo</th><th style={th}>Perfil</th><th style={th}>Universidad</th><th style={th}>Accion</th></tr>
+                      <tr><th style={th}>ID</th><th style={th}>Nombre</th><th style={th}>Correo</th><th style={th}>Perfil</th><th style={th}>Universidad</th><th style={th}>Acciones</th></tr>
                     </thead>
                     <tbody>
                       {datos.map((u: any) => (
-                        <tr key={u.id}>
-                          <td style={td}>{u.id}</td>
-                          <td style={{ ...td, fontWeight: 500 }}>{u.nombre}</td>
-                          <td style={{ ...td, color: '#9E9890' }}>{u.correo}</td>
-                          <td style={td}>{badgePerfil(u.perfil)}</td>
-                          <td style={td}>{u.universidad}</td>
-                          <td style={td}>
-                            <button onClick={() => handleEliminar('usuario', u.id, u.nombre)}
-                              style={{ background: '#fee2e2', color: '#991b1b', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '12px', cursor: 'pointer', fontFamily: sans }}>
-                              Eliminar
-                            </button>
-                          </td>
-                        </tr>
+                        <>
+                          <tr key={u.id}>
+                            <td style={td}>{u.id}</td>
+                            <td style={{ ...td, fontWeight: 500 }}>{u.nombre}</td>
+                            <td style={{ ...td, color: '#9E9890' }}>{u.correo}</td>
+                            <td style={td}>{badgePerfil(u.perfil)}</td>
+                            <td style={td}>{u.universidad}</td>
+                            <td style={td}>
+                              <div style={{ display: 'flex', gap: '8px' }}>
+                                <button onClick={() => handleEditar(u)}
+                                  style={{ background: '#EDEDE9', color: '#1a1a1a', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '12px', cursor: 'pointer', fontFamily: sans }}>
+                                  Editar
+                                </button>
+                                <button onClick={() => handleEliminar('usuario', u.id, u.nombre)}
+                                  style={{ background: '#fee2e2', color: '#991b1b', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '12px', cursor: 'pointer', fontFamily: sans }}>
+                                  Eliminar
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                          {editando === u.id && (
+                            <tr key={`edit-${u.id}`}>
+                              <td colSpan={6} style={{ padding: '16px 12px', background: '#FAFAF8', borderBottom: '0.5px solid #EDEDE9' }}>
+                                {formUsuario(formEditar, setFormEditar)}
+                                <div style={{ display: 'flex', gap: '10px' }}>
+                                  <button onClick={handleGuardarEdicion}
+                                    style={{ background: '#1a1a1a', color: '#fff', border: 'none', borderRadius: '8px', padding: '9px 20px', fontSize: '12px', cursor: 'pointer', fontFamily: sans }}>
+                                    Guardar
+                                  </button>
+                                  <button onClick={() => setEditando(null)}
+                                    style={{ background: '#EDEDE9', color: '#1a1a1a', border: 'none', borderRadius: '8px', padding: '9px 20px', fontSize: '12px', cursor: 'pointer', fontFamily: sans }}>
+                                    Cancelar
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </>
                       ))}
                     </tbody>
                   </table>
                 ) : tab === 'vehiculos' ? (
                   <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }}>
                     <thead>
-                      <tr><th style={th}>ID</th><th style={th}>Conductor</th><th style={th}>Placa</th><th style={th}>Vehiculo</th><th style={th}>Color</th><th style={th}>Puestos</th><th style={th}>Accion</th></tr>
+                      <tr><th style={th}>ID</th><th style={th}>Conductor</th><th style={th}>Placa</th><th style={th}>Vehiculo</th><th style={th}>Color</th><th style={th}>Puestos</th><th style={th}>Acciones</th></tr>
                     </thead>
                     <tbody>
                       {datos.map((v: any) => (
-                        <tr key={v.id}>
-                          <td style={td}>{v.id}</td>
-                          <td style={{ ...td, fontWeight: 500 }}>{v.conductor_nombre}</td>
-                          <td style={{ ...td, fontFamily: 'monospace', fontWeight: 700, letterSpacing: '1px' }}>{v.placa}</td>
-                          <td style={td}>{v.marca} {v.modelo}</td>
-                          <td style={td}>{v.color}</td>
-                          <td style={td}>{v.puestos}</td>
-                          <td style={td}>
-                            <button onClick={() => handleEliminar('vehiculo', v.id, v.placa)}
-                              style={{ background: '#fee2e2', color: '#991b1b', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '12px', cursor: 'pointer', fontFamily: sans }}>
-                              Eliminar
-                            </button>
-                          </td>
-                        </tr>
+                        <>
+                          <tr key={v.id}>
+                            <td style={td}>{v.id}</td>
+                            <td style={{ ...td, fontWeight: 500 }}>{v.conductor_nombre}</td>
+                            <td style={{ ...td, fontFamily: 'monospace', fontWeight: 700, letterSpacing: '1px' }}>{v.placa}</td>
+                            <td style={td}>{v.marca} {v.modelo}</td>
+                            <td style={td}>{v.color}</td>
+                            <td style={td}>{v.puestos}</td>
+                            <td style={td}>
+                              <div style={{ display: 'flex', gap: '8px' }}>
+                                <button onClick={() => handleEditar(v)}
+                                  style={{ background: '#EDEDE9', color: '#1a1a1a', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '12px', cursor: 'pointer', fontFamily: sans }}>
+                                  Editar
+                                </button>
+                                <button onClick={() => handleEliminar('vehiculo', v.id, v.placa)}
+                                  style={{ background: '#fee2e2', color: '#991b1b', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '12px', cursor: 'pointer', fontFamily: sans }}>
+                                  Eliminar
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                          {editando === v.id && (
+                            <tr key={`edit-${v.id}`}>
+                              <td colSpan={7} style={{ padding: '16px 12px', background: '#FAFAF8', borderBottom: '0.5px solid #EDEDE9' }}>
+                                {formVehiculo(formEditar, setFormEditar)}
+                                <div style={{ display: 'flex', gap: '10px' }}>
+                                  <button onClick={handleGuardarEdicion}
+                                    style={{ background: '#1a1a1a', color: '#fff', border: 'none', borderRadius: '8px', padding: '9px 20px', fontSize: '12px', cursor: 'pointer', fontFamily: sans }}>
+                                    Guardar
+                                  </button>
+                                  <button onClick={() => setEditando(null)}
+                                    style={{ background: '#EDEDE9', color: '#1a1a1a', border: 'none', borderRadius: '8px', padding: '9px 20px', fontSize: '12px', cursor: 'pointer', fontFamily: sans }}>
+                                    Cancelar
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </>
                       ))}
                     </tbody>
                   </table>
                 ) : (
                   <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '700px' }}>
                     <thead>
-                      <tr><th style={th}>ID</th><th style={th}>Conductor</th><th style={th}>Origen</th><th style={th}>Destino</th><th style={th}>Hora</th><th style={th}>Estado</th><th style={th}>Reservas</th><th style={th}>Accion</th></tr>
+                      <tr><th style={th}>ID</th><th style={th}>Conductor</th><th style={th}>Origen</th><th style={th}>Destino</th><th style={th}>Hora</th><th style={th}>Estado</th><th style={th}>Reservas</th><th style={th}>Acciones</th></tr>
                     </thead>
                     <tbody>
                       {datos.map((r: any) => (
-                        <tr key={r.id}>
-                          <td style={td}>{r.id}</td>
-                          <td style={{ ...td, fontWeight: 500 }}>{r.conductor_nombre}</td>
-                          <td style={td}>{r.origen}</td>
-                          <td style={td}>{r.destino}</td>
-                          <td style={{ ...td, fontFamily: serif }}>{r.hora_salida}</td>
-                          <td style={td}>{badgeEstado(r.estado)}</td>
-                          <td style={td}>{r.total_reservas}</td>
-                          <td style={td}>
-                            <button onClick={() => handleEliminar('ruta', r.id, `${r.origen}→${r.destino}`)}
-                              style={{ background: '#fee2e2', color: '#991b1b', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '12px', cursor: 'pointer', fontFamily: sans }}>
-                              Eliminar
-                            </button>
-                          </td>
-                        </tr>
+                        <>
+                          <tr key={r.id}>
+                            <td style={td}>{r.id}</td>
+                            <td style={{ ...td, fontWeight: 500 }}>{r.conductor_nombre}</td>
+                            <td style={td}>{r.origen}</td>
+                            <td style={td}>{r.destino}</td>
+                            <td style={{ ...td, fontFamily: serif }}>{r.hora_salida}</td>
+                            <td style={td}>{badgeEstado(r.estado)}</td>
+                            <td style={td}>{r.total_reservas}</td>
+                            <td style={td}>
+                              <div style={{ display: 'flex', gap: '8px' }}>
+                                <button onClick={() => handleEditar(r)}
+                                  style={{ background: '#EDEDE9', color: '#1a1a1a', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '12px', cursor: 'pointer', fontFamily: sans }}>
+                                  Editar
+                                </button>
+                                <button onClick={() => handleEliminar('ruta', r.id, `${r.origen}→${r.destino}`)}
+                                  style={{ background: '#fee2e2', color: '#991b1b', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '12px', cursor: 'pointer', fontFamily: sans }}>
+                                  Eliminar
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                          {editando === r.id && (
+                            <tr key={`edit-${r.id}`}>
+                              <td colSpan={8} style={{ padding: '16px 12px', background: '#FAFAF8', borderBottom: '0.5px solid #EDEDE9' }}>
+                                {formRuta(formEditar, setFormEditar)}
+                                <div style={{ display: 'flex', gap: '10px' }}>
+                                  <button onClick={handleGuardarEdicion}
+                                    style={{ background: '#1a1a1a', color: '#fff', border: 'none', borderRadius: '8px', padding: '9px 20px', fontSize: '12px', cursor: 'pointer', fontFamily: sans }}>
+                                    Guardar
+                                  </button>
+                                  <button onClick={() => setEditando(null)}
+                                    style={{ background: '#EDEDE9', color: '#1a1a1a', border: 'none', borderRadius: '8px', padding: '9px 20px', fontSize: '12px', cursor: 'pointer', fontFamily: sans }}>
+                                    Cancelar
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </>
                       ))}
                     </tbody>
                   </table>
