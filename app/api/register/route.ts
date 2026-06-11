@@ -5,9 +5,20 @@ export async function POST(request: Request) {
   try {
     const { nombre, correo, contrasena, perfil, universidad, tipo_conductor } = await request.json();
 
+    if (!nombre || !correo || !contrasena || !perfil || !universidad) {
+      return NextResponse.json({ error: 'Todos los campos son obligatorios' }, { status: 400 });
+    }
+
+    const correoNormalizado = correo.trim().toLowerCase();
+
+    const regexCorreo = /^[a-zA-Z][a-zA-Z0-9._+-]*@[a-zA-Z0-9-]+\.edu\.co$/;
+    if (!regexCorreo.test(correoNormalizado)) {
+      return NextResponse.json({ error: 'Ingresa un correo institucional válido (ejemplo: usuario@elpoli.edu.co)' }, { status: 400 });
+    }
+
     await db.execute(
       'INSERT INTO usuarios (nombre, correo, contrasena, perfil, universidad, tipo_conductor) VALUES (?, ?, ?, ?, ?, ?)',
-      [nombre, correo, contrasena, perfil, universidad, tipo_conductor || null]
+      [nombre, correoNormalizado, contrasena, perfil, universidad, tipo_conductor || null]
     );
 
     return NextResponse.json({ mensaje: 'Usuario registrado exitosamente' }, { status: 201 });

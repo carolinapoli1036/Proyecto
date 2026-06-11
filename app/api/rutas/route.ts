@@ -30,6 +30,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Faltan campos requeridos' }, { status: 400 });
     }
 
+    // Validar que la fecha+hora no sea en el pasado (zona horaria Colombia UTC-5)
+    const ahoraColombia = new Date(Date.now() - 5 * 60 * 60 * 1000);
+    const fechaHoraRuta = new Date(`${fecha}T${hora_salida}:00`);
+
+    if (fechaHoraRuta <= ahoraColombia) {
+      return NextResponse.json({ error: 'No puedes publicar una ruta con fecha y hora en el pasado' }, { status: 400 });
+    }
+
     await db.execute(
       `INSERT INTO rutas (conductor_id, tipo_origen, origen, destino, hora_salida, puestos_disponibles, puestos_totales, estado, fecha)
        VALUES (?, ?, ?, ?, ?, ?, ?, 'activa', ?)`,

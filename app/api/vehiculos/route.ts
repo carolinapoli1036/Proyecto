@@ -5,9 +5,17 @@ export async function POST(request: Request) {
   try {
     const { conductor_id, placa, marca, modelo, color, puestos } = await request.json();
 
+    if (!conductor_id || !placa || !marca || !modelo || !color || !puestos) {
+      return NextResponse.json({ error: 'Todos los campos son obligatorios' }, { status: 400 });
+    }
+
+    if (String(placa).trim().length < 5) {
+      return NextResponse.json({ error: 'La placa no es válida' }, { status: 400 });
+    }
+
     const [result]: any = await db.execute(
       'INSERT INTO vehiculos (conductor_id, placa, marca, modelo, color, puestos) VALUES (?, ?, ?, ?, ?, ?)',
-      [conductor_id, placa, marca, modelo, color, puestos]
+      [conductor_id, String(placa).trim().toUpperCase(), marca, modelo, color, puestos]
     );
 
     return NextResponse.json({ mensaje: 'Vehículo registrado exitosamente' }, { status: 201 });

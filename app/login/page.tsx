@@ -9,45 +9,46 @@ export default function LoginPage() {
   const serif = "'DM Serif Display', Georgia, serif";
   const sans = "'DM Sans', system-ui, sans-serif";
 
-const handleLogin = async () => {
-  setError('');
+  const handleLogin = async () => {
+    setError('');
 
-  if (!correo || !contrasena) {
-    setError('Por favor completa todos los campos'); return;
-  }
+    if (!correo || !contrasena) {
+      setError('Por favor completa todos los campos'); return;
+    }
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(correo)) {
-    setError('El correo electrónico no es válido'); return;
-  }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(correo)) {
+      setError('El correo electrónico no es válido'); return;
+    }
 
-  if (contrasena.length < 8) {
-    setError('La contraseña debe tener al menos 8 caracteres'); return;
-  }
+    if (contrasena.length < 8) {
+      setError('La contraseña debe tener al menos 8 caracteres'); return;
+    }
 
-  if (!/[A-Z]/.test(contrasena)) {
-    setError('La contraseña debe tener al menos una letra mayúscula'); return;
-  }
+    if (!/[A-Z]/.test(contrasena)) {
+      setError('La contraseña debe tener al menos una letra mayúscula'); return;
+    }
 
-  if (!/[0-9]/.test(contrasena)) {
-    setError('La contraseña debe tener al menos un número'); return;
-  }
+    if (!/[0-9]/.test(contrasena)) {
+      setError('La contraseña debe tener al menos un número'); return;
+    }
 
-  const res = await fetch('/api/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ correo, contrasena }),
-  });
-  const data = await res.json();
-  if (res.ok) {
-    localStorage.setItem('usuario', JSON.stringify(data.usuario));
-    if (data.usuario.perfil === 'admin') window.location.href = '/admin/dashboard';
-    else if (data.usuario.perfil === 'conductor') window.location.href = '/driver/dashboard';
-    else window.location.href = '/passenger/dashboard';
-  } else {
-    setError(data.error);
-  }
-};
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ correo, contrasena }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      localStorage.setItem('usuario', JSON.stringify(data.usuario));
+      if (data.usuario.perfil === 'admin') window.location.href = '/admin/dashboard';
+      else if (data.usuario.perfil === 'conductor') window.location.href = '/driver/dashboard';
+      else window.location.href = '/passenger/dashboard';
+    } else {
+      setError(data.error);
+    }
+  };
+
   return (
     <div style={{ display: 'flex', minHeight: '100vh', flex: 1, fontFamily: sans }}>
 
@@ -67,6 +68,20 @@ const handleLogin = async () => {
           <p style={{ fontSize: '14px', color: '#6b6b6b', lineHeight: 1.7, fontFamily: sans, fontWeight: 300, maxWidth: '320px' }}>
             Inicia sesion para acceder a tus rutas, reservas y puntos acumulados.
           </p>
+
+          {/* Banner conductor */}
+          <div style={{ marginTop: '32px', background: 'rgba(251,191,36,0.08)', border: '0.5px solid rgba(251,191,36,0.25)', borderRadius: '12px', padding: '20px 24px' }}>
+            <p style={{ fontSize: '11px', color: '#fbbf24', letterSpacing: '1.5px', textTransform: 'uppercase' as const, marginBottom: '10px', fontFamily: sans }}>¿Tienes carro?</p>
+            <p style={{ fontSize: '22px', fontWeight: 400, color: '#fff', fontFamily: serif, marginBottom: '10px', lineHeight: 1.2 }}>
+              Gana <em style={{ color: '#fbbf24', fontStyle: 'italic' }}>$4.000</em><br />por cada pasajero
+            </p>
+            <p style={{ fontSize: '12px', color: '#6b6b6b', fontFamily: sans, lineHeight: 1.6, marginBottom: '16px' }}>
+              Regístrate como conductor, publica tu ruta hacia la universidad y recibe una contribución de cada pasajero. Tú ya vas — nosotros te ayudamos a cubrir la gasolina.
+            </p>
+            <a href="/register" style={{ display: 'inline-block', background: '#fbbf24', color: '#1a1a1a', borderRadius: '8px', padding: '9px 20px', fontSize: '12px', fontWeight: 600, textDecoration: 'none', fontFamily: sans }}>
+              Registrarme como conductor →
+            </a>
+          </div>
         </div>
 
         <div style={{ display: 'flex', gap: '32px' }}>

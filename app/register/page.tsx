@@ -11,16 +11,43 @@ export default function RegisterPage() {
 
   const handleSubmit = async () => {
     setError(''); setCargando(true);
-    if (!form.nombre || !form.correo || !form.contrasena || !form.perfil || !form.universidad) {
-      setError('Por favor completa todos los campos'); setCargando(false); return;
+
+    if (!form.nombre.trim()) {
+      setError('El nombre es obligatorio'); setCargando(false); return;
+    }
+    if (!form.correo.trim()) {
+      setError('El correo es obligatorio'); setCargando(false); return;
+    }
+    const regexCorreo = /^[a-zA-Z][a-zA-Z0-9._+-]*@[a-zA-Z0-9-]+\.edu\.co$/;
+    if (!regexCorreo.test(form.correo.trim())) {
+      setError('El correo debe ser institucional y válido (ejemplo: usuario@elpoli.edu.co)'); setCargando(false); return;
+    }
+    if (!form.contrasena) {
+      setError('La contraseña es obligatoria'); setCargando(false); return;
+    }
+    if (form.contrasena.length < 8) {
+      setError('La contraseña debe tener mínimo 8 caracteres'); setCargando(false); return;
+    }
+    if (!/[A-Z]/.test(form.contrasena)) {
+      setError('La contraseña debe tener al menos una letra mayúscula'); setCargando(false); return;
+    }
+    if (!/[0-9]/.test(form.contrasena)) {
+      setError('La contraseña debe tener al menos un número'); setCargando(false); return;
+    }
+    if (!form.perfil) {
+      setError('Selecciona un perfil (pasajero o conductor)'); setCargando(false); return;
     }
     if (form.perfil === 'conductor' && !form.tipo_conductor) {
       setError('Selecciona si eres estudiante o docente'); setCargando(false); return;
     }
+    if (!form.universidad) {
+      setError('Selecciona tu universidad'); setCargando(false); return;
+    }
+
     const res = await fetch('/api/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
+      body: JSON.stringify({ ...form, correo: form.correo.trim().toLowerCase() }),
     });
     const data = await res.json();
     if (res.ok) window.location.href = '/login';
@@ -91,6 +118,9 @@ export default function RegisterPage() {
             <label style={{ fontSize: '11px', color: '#9E9890', display: 'block', marginBottom: '8px', fontFamily: sans }}>Contraseña</label>
             <input type="password" placeholder="••••••••" style={inputStyle}
               value={form.contrasena} onChange={e => setForm({ ...form, contrasena: e.target.value })} />
+            <p style={{ fontSize: '11px', color: '#9E9890', marginTop: '6px', fontFamily: sans }}>
+              Mínimo 8 caracteres, una mayúscula y un número
+            </p>
           </div>
 
           <div style={{ marginBottom: '16px' }}>

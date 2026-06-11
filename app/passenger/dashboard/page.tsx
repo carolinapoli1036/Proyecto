@@ -213,13 +213,14 @@ export default function PassengerDashboard() {
   return (
     <div style={{ background: '#EDEDE9', minHeight: '100vh', flex: 1, fontFamily: sans }}>
 
-      {chatReserva && (
+      {chatReserva && usuario && (
         <Chat
           reserva_id={chatReserva.id}
           usuario_id={usuario.id}
           usuario_nombre={usuario.nombre}
           conductor_nombre={chatReserva.conductor_nombre}
           ruta={`${chatReserva.origen} → ${chatReserva.destino}`}
+          estadoReserva={chatReserva.estado}
           onCerrar={() => setChatReserva(null)}
         />
       )}
@@ -293,7 +294,6 @@ export default function PassengerDashboard() {
         {mensaje && <div style={{ background: '#1a1a1a', color: '#D6CCC2', borderRadius: '10px', padding: '14px 20px', fontSize: '13px', marginBottom: '24px', fontFamily: sans }}>{mensaje}</div>}
         {error && <div style={{ background: '#fee2e2', color: '#991b1b', borderRadius: '10px', padding: '14px 20px', fontSize: '13px', marginBottom: '24px', fontFamily: sans }}>{error}</div>}
 
-        {/* Buscar ruta */}
         <div className="card" style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '20px' }}>
           <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>Buscar ruta</p>
           <div className="buscar-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '16px', alignItems: 'flex-end' }}>
@@ -316,13 +316,11 @@ export default function PassengerDashboard() {
           </div>
         </div>
 
-        {/* Mapa */}
         <div className="card" style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '20px' }}>
           <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>Mapa de rutas</p>
           <MapaRutas tipo="pasajero" />
         </div>
 
-        {/* Rutas disponibles */}
         <div className="card" style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '20px' }}>
           <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>Rutas disponibles</p>
           {rutas.length === 0 ? (
@@ -330,7 +328,7 @@ export default function PassengerDashboard() {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {rutas.map((ruta: any) => (
-                <div className="ruta-card" key={ruta.id} style={{ display: 'grid', gridTemplateColumns: '1.5fr 1.5fr 1fr 80px 80px auto', gap: '16px', alignItems: 'center', padding: '18px 20px', background: '#FAFAF8', border: '0.5px solid #EDEDE9', borderRadius: '10px' }}>
+                <div className="ruta-card" key={ruta.id} style={{ display: 'grid', gridTemplateColumns: '1.5fr 1.5fr 1fr 80px 80px 90px auto', gap: '16px', alignItems: 'center', padding: '18px 20px', background: '#FAFAF8', border: '0.5px solid #EDEDE9', borderRadius: '10px' }}>
                   <div>
                     <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>ORIGEN</p>
                     <p style={{ fontSize: '13px', color: '#1a1a1a', fontWeight: 500, fontFamily: sans }}>{ruta.origen}</p>
@@ -351,6 +349,10 @@ export default function PassengerDashboard() {
                     <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>PUESTOS</p>
                     <p style={{ fontSize: '13px', color: '#1a1a1a', fontFamily: sans }}>{ruta.puestos_disponibles}</p>
                   </div>
+                  <div>
+                    <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>CONTRIBUCIÓN</p>
+                    <p style={{ fontSize: '13px', color: '#1a1a1a', fontWeight: 500, fontFamily: serif }}>$4.000</p>
+                  </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                     <button onClick={() => handleReservar(ruta.id)} disabled={ruta.puestos_disponibles === 0}
                       style={{ background: ruta.puestos_disponibles === 0 ? '#EDEDE9' : '#1a1a1a', color: ruta.puestos_disponibles === 0 ? '#9E9890' : '#fff', border: 'none', borderRadius: '8px', padding: '8px 14px', fontSize: '12px', cursor: ruta.puestos_disponibles === 0 ? 'not-allowed' : 'pointer', fontFamily: sans, whiteSpace: 'nowrap' as const }}>
@@ -369,7 +371,6 @@ export default function PassengerDashboard() {
           )}
         </div>
 
-        {/* Mis reservas */}
         <div className="card" style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px' }}>
           <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>Mis reservas</p>
           {misReservas.length === 0 ? (
@@ -377,7 +378,7 @@ export default function PassengerDashboard() {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {misReservas.map((reserva: any) => (
-                <div className="reserva-card" key={reserva.id} style={{ display: 'grid', gridTemplateColumns: '2fr 80px auto auto auto auto', gap: '16px', alignItems: 'center', padding: '18px 20px', background: '#FAFAF8', border: '0.5px solid #EDEDE9', borderRadius: '10px' }}>
+                <div className="reserva-card" key={reserva.id} style={{ display: 'grid', gridTemplateColumns: '2fr 80px 90px auto auto auto auto', gap: '16px', alignItems: 'center', padding: '18px 20px', background: '#FAFAF8', border: '0.5px solid #EDEDE9', borderRadius: '10px' }}>
                   <div>
                     <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>RUTA</p>
                     <p style={{ fontSize: '13px', color: '#1a1a1a', fontWeight: 500, fontFamily: sans }}>{reserva.origen} → {reserva.destino}</p>
@@ -386,6 +387,12 @@ export default function PassengerDashboard() {
                   <div>
                     <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>HORA</p>
                     <p style={{ fontSize: '13px', color: '#1a1a1a', fontFamily: serif }}>{reserva.hora_salida}</p>
+                  </div>
+                  <div>
+                    <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>CONTRIBUCIÓN</p>
+                    <p style={{ fontSize: '13px', color: '#1a1a1a', fontWeight: 500, fontFamily: serif }}>
+                      {reserva.estado === 'confirmada' ? '$4.000' : reserva.estado === 'completada' ? '$4.000 ✓' : '—'}
+                    </p>
                   </div>
                   <div>{badgeEstado(reserva.estado)}</div>
                   <div>
@@ -405,7 +412,7 @@ export default function PassengerDashboard() {
                     )}
                   </div>
                   <div>
-                    {(reserva.estado === 'confirmada' || reserva.estado === 'completada') && (
+                    {reserva.estado === 'confirmada' && (
                       <button onClick={() => setChatReserva(reserva)}
                         style={{ background: '#1a1a1a', color: '#fff', border: 'none', borderRadius: '8px', padding: '8px 16px', fontSize: '12px', cursor: 'pointer', fontFamily: sans, whiteSpace: 'nowrap' as const }}>
                         💬 Chat

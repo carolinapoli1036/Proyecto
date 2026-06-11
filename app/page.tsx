@@ -34,7 +34,7 @@ export default function Home() {
           </h1>
 
           <p style={{ fontSize: '16px', color: '#6b6b6b', lineHeight: 1.7, marginBottom: '48px', maxWidth: '480px', fontFamily: sans, fontWeight: 300 }}>
-            Conectamos estudiantes universitarios de Medellin para compartir rutas, reducir costos y llegar juntos a la U.
+            Conectamos estudiantes universitarios de Medellín para compartir rutas, reducir costos y contribuir a la reducción de la congestión vehicular en la ciudad.
           </p>
 
           <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
@@ -63,16 +63,22 @@ export default function Home() {
 
       <div style={{ background: '#EDEDE9', padding: '80px 48px' }}>
         <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase' as const, marginBottom: '48px', fontFamily: sans }}>Como funciona</p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' }}>
           {[
-            { num: '01', title: 'Registrate', desc: 'Crea tu cuenta con tu correo universitario y selecciona tu perfil: conductor o pasajero.' },
-            { num: '02', title: 'Encuentra tu ruta', desc: 'Busca rutas disponibles desde tu estacion de metro o comuna hacia tu universidad.' },
-            { num: '03', title: 'Viaja y gana puntos', desc: 'Completa viajes y acumula puntos. Cada 70 puntos obtienes un viaje gratis.' },
+            { num: '01', title: 'Registrate', desc: 'Crea tu cuenta con tu correo universitario y selecciona tu perfil: conductor o pasajero.', highlight: false },
+            { num: '02', title: 'Encuentra tu ruta', desc: 'Busca rutas disponibles desde tu estacion de metro o comuna hacia tu universidad.', highlight: false },
+            { num: '03', title: 'Viaja y gana puntos', desc: 'Completa viajes y acumula puntos. Cada 70 puntos obtienes un viaje gratis.', highlight: false },
+            { num: '04', title: '¿Tienes carro?', desc: 'Registrate como conductor y recibe $4.000 de contribución por cada pasajero. Tú ya vas a la U — compartir el viaje te ayuda a cubrir la gasolina y reduces el tráfico.', highlight: true },
           ].map((f, i) => (
-            <div key={i} style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '32px' }}>
+            <div key={i} style={{ background: f.highlight ? '#1a1a1a' : '#fff', border: `0.5px solid ${f.highlight ? 'rgba(214,204,194,0.3)' : '#D6CCC2'}`, borderRadius: '16px', padding: '32px' }}>
               <p style={{ fontSize: '11px', color: '#D6CCC2', letterSpacing: '2px', marginBottom: '20px', fontFamily: sans }}>{f.num}</p>
-              <h3 style={{ fontSize: '22px', fontWeight: 400, color: '#1a1a1a', marginBottom: '12px', fontFamily: serif }}>{f.title}</h3>
+              <h3 style={{ fontSize: '22px', fontWeight: 400, color: f.highlight ? '#fff' : '#1a1a1a', marginBottom: '12px', fontFamily: serif }}>{f.title}</h3>
               <p style={{ fontSize: '13px', color: '#9E9890', lineHeight: 1.7, fontFamily: sans, fontWeight: 300 }}>{f.desc}</p>
+              {f.highlight && (
+                <a href="/register" style={{ display: 'inline-block', marginTop: '20px', background: '#D6CCC2', color: '#1a1a1a', borderRadius: '8px', padding: '9px 20px', fontSize: '12px', fontWeight: 600, textDecoration: 'none', fontFamily: sans }}>
+                  Registrarme como conductor →
+                </a>
+              )}
             </div>
           ))}
         </div>
