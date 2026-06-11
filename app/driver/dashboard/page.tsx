@@ -22,7 +22,7 @@ export default function DriverDashboard() {
   const [misReservasComoP, setMisReservasComoP] = useState<any[]>([]);
 
   const [formRuta, setFormRuta] = useState({
-    tipo_origen: '', origen: '', destino: '', hora_salida: '', puestos: 4, fecha: '',
+    tipo_origen: '', origen: '', destino: '', hora_salida: '', puestos: 4, fecha: '', punto_encuentro: '',
   });
 
   const [formVehiculo, setFormVehiculo] = useState({
@@ -115,7 +115,7 @@ export default function DriverDashboard() {
     if (res.ok) {
       setMensaje('Ruta publicada exitosamente');
       cargarRutas(usuario.id);
-      setFormRuta({ tipo_origen: '', origen: '', destino: '', hora_salida: '', puestos: 4, fecha: '' });
+      setFormRuta({ tipo_origen: '', origen: '', destino: '', hora_salida: '', puestos: 4, fecha: '', punto_encuentro: '' });
     } else { setError(data.error); }
   };
 
@@ -203,7 +203,6 @@ export default function DriverDashboard() {
   const pasajerosActivos = rutas.filter(r => r.estado === 'activa').reduce((acc: number, r: any) => acc + (r.puestos_totales - r.puestos_disponibles), 0);
   const nivel = rutasCompletadas >= 10 ? 'Elite' : rutasCompletadas >= 5 ? 'Destacado' : 'Nuevo';
   const viajesGratisDisponibles = Math.floor(puntos / 70);
-  const puntosParaSiguiente = 70 - (puntos % 70);
 
   const inputStyle: React.CSSProperties = { background: '#FAFAF8', border: '0.5px solid #D6CCC2', borderRadius: '8px', padding: '10px 14px', fontSize: '13px', color: '#1a1a1a', width: '100%', outline: 'none', fontFamily: sans, boxSizing: 'border-box' };
   const labelStyle: React.CSSProperties = { fontSize: '11px', color: '#9E9890', display: 'block', marginBottom: '6px', fontFamily: sans, letterSpacing: '0.5px' };
@@ -390,14 +389,14 @@ export default function DriverDashboard() {
           </div>
 
           {viajesGratisDisponibles > 0 && (
-            <div style={{ marginTop: '16px', background: 'rgba(251,191,36,0.1)', border: '0.5px solid #fbbf2440', borderRadius: '10px', padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ marginTop: '16px', background: 'rgba(214,204,194,0.1)', border: '0.5px solid rgba(214,204,194,0.3)', borderRadius: '10px', padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
-                <p style={{ fontSize: '14px', fontWeight: 500, color: '#fbbf24', fontFamily: sans, marginBottom: '4px' }}>
+                <p style={{ fontSize: '14px', fontWeight: 500, color: '#D6CCC2', fontFamily: sans, marginBottom: '4px' }}>
                   Tienes {viajesGratisDisponibles} viaje{viajesGratisDisponibles > 1 ? 's' : ''} gratis disponible{viajesGratisDisponibles > 1 ? 's' : ''}
                 </p>
                 <p style={{ fontSize: '12px', color: '#6b6b6b', fontFamily: sans }}>Úsalos en la sección "Buscar ruta como pasajero"</p>
               </div>
-              <div style={{ background: '#fbbf24', color: '#1a1a1a', borderRadius: '8px', padding: '8px 16px', fontSize: '12px', fontWeight: 500, fontFamily: sans }}>
+              <div style={{ background: '#D6CCC2', color: '#1a1a1a', borderRadius: '8px', padding: '8px 16px', fontSize: '12px', fontWeight: 500, fontFamily: sans }}>
                 {viajesGratisDisponibles} disponible{viajesGratisDisponibles > 1 ? 's' : ''}
               </div>
             </div>
@@ -426,8 +425,8 @@ export default function DriverDashboard() {
             </div>
           )}
           {rutasCompletadas >= 10 && (
-            <div style={{ marginTop: '16px', background: 'rgba(251,191,36,0.1)', border: '0.5px solid #fbbf2440', borderRadius: '10px', padding: '12px 20px' }}>
-              <p style={{ fontSize: '13px', color: '#fbbf24', fontFamily: sans }}>Eres Conductor Elite. Gracias por ser parte de la comunidad CARPODRIVE.</p>
+            <div style={{ marginTop: '16px', background: 'rgba(214,204,194,0.1)', border: '0.5px solid rgba(214,204,194,0.3)', borderRadius: '10px', padding: '12px 20px' }}>
+              <p style={{ fontSize: '13px', color: '#D6CCC2', fontFamily: sans }}>Eres Conductor Elite. Gracias por ser parte de la comunidad CARPODRIVE.</p>
             </div>
           )}
         </div>
@@ -482,7 +481,7 @@ export default function DriverDashboard() {
         {/* Publicar ruta */}
         <div className="card" style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '20px' }}>
           <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>Publicar nueva ruta</p>
-          <div className="form-ruta-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto auto auto', gap: '16px', alignItems: 'flex-end' }}>
+          <div className="form-ruta-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto auto auto', gap: '16px', alignItems: 'flex-end', marginBottom: '16px' }}>
             <div>
               <label style={labelStyle}>Origen</label>
               <select style={inputStyle} value={formRuta.origen} onChange={e => setFormRuta({ ...formRuta, origen: e.target.value })}>
@@ -512,6 +511,12 @@ export default function DriverDashboard() {
             </div>
             <button onClick={handlePublicar} style={{ background: '#1a1a1a', color: '#fff', border: 'none', borderRadius: '8px', padding: '10px 24px', fontSize: '13px', cursor: 'pointer', fontFamily: sans, whiteSpace: 'nowrap' }}>Publicar</button>
           </div>
+          <div>
+            <label style={labelStyle}>Punto de encuentro (opcional)</label>
+            <input type="text" placeholder="Ej: Parque de Belén, Entrada principal del metro Itagüí..." style={inputStyle} value={formRuta.punto_encuentro}
+              onChange={e => setFormRuta({ ...formRuta, punto_encuentro: e.target.value })} />
+            <p style={{ fontSize: '11px', color: '#9E9890', marginTop: '6px', fontFamily: sans }}>Indica dónde exactamente recogerás a los pasajeros</p>
+          </div>
         </div>
 
         {/* Mapa */}
@@ -533,6 +538,7 @@ export default function DriverDashboard() {
                     <div>
                       <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>ORIGEN</p>
                       <p style={{ fontSize: '13px', color: '#1a1a1a', fontWeight: 500, fontFamily: sans }}>{ruta.origen}</p>
+                      {ruta.punto_encuentro && <p style={{ fontSize: '11px', color: '#9E9890', marginTop: '2px', fontFamily: sans }}>📍 {ruta.punto_encuentro}</p>}
                     </div>
                     <div>
                       <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>DESTINO</p>
@@ -627,10 +633,11 @@ export default function DriverDashboard() {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {rutasDisponibles.map((ruta: any) => (
-                <div key={ruta.id} style={{ display: 'grid', gridTemplateColumns: '1.5fr 1.5fr 1fr 80px 80px auto', gap: '16px', alignItems: 'center', padding: '18px 20px', background: '#FAFAF8', border: '0.5px solid #EDEDE9', borderRadius: '10px' }}>
+                <div key={ruta.id} style={{ display: 'grid', gridTemplateColumns: '1.5fr 1.5fr 1fr 80px 80px 90px auto', gap: '16px', alignItems: 'center', padding: '18px 20px', background: '#FAFAF8', border: '0.5px solid #EDEDE9', borderRadius: '10px' }}>
                   <div>
                     <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>ORIGEN</p>
                     <p style={{ fontSize: '13px', color: '#1a1a1a', fontWeight: 500, fontFamily: sans }}>{ruta.origen}</p>
+                    {ruta.punto_encuentro && <p style={{ fontSize: '11px', color: '#9E9890', marginTop: '2px', fontFamily: sans }}>📍 {ruta.punto_encuentro}</p>}
                   </div>
                   <div>
                     <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>DESTINO</p>
@@ -648,6 +655,10 @@ export default function DriverDashboard() {
                     <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>PUESTOS</p>
                     <p style={{ fontSize: '13px', color: '#1a1a1a', fontFamily: sans }}>{ruta.puestos_disponibles}</p>
                   </div>
+                  <div>
+                    <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>CONTRIBUCIÓN</p>
+                    <p style={{ fontSize: '13px', color: '#1a1a1a', fontWeight: 500, fontFamily: serif }}>$4.000</p>
+                  </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                     <button onClick={() => handleReservar(ruta.id)} disabled={ruta.puestos_disponibles === 0}
                       style={{ background: ruta.puestos_disponibles === 0 ? '#EDEDE9' : '#1a1a1a', color: ruta.puestos_disponibles === 0 ? '#9E9890' : '#fff', border: 'none', borderRadius: '8px', padding: '8px 14px', fontSize: '12px', cursor: ruta.puestos_disponibles === 0 ? 'not-allowed' : 'pointer', fontFamily: sans, whiteSpace: 'nowrap' as const }}>
@@ -655,7 +666,7 @@ export default function DriverDashboard() {
                     </button>
                     {viajesGratisDisponibles > 0 && ruta.puestos_disponibles > 0 && (
                       <button onClick={() => handleUsarViajeGratis(ruta.id)}
-                        style={{ background: '#fbbf24', color: '#1a1a1a', border: 'none', borderRadius: '8px', padding: '8px 14px', fontSize: '11px', cursor: 'pointer', fontFamily: sans, fontWeight: 500, whiteSpace: 'nowrap' as const }}>
+                        style={{ background: '#D6CCC2', color: '#1a1a1a', border: 'none', borderRadius: '8px', padding: '8px 14px', fontSize: '11px', cursor: 'pointer', fontFamily: sans, fontWeight: 500, whiteSpace: 'nowrap' as const }}>
                         Usar gratis
                       </button>
                     )}

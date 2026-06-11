@@ -256,21 +256,21 @@ export default function PassengerDashboard() {
             ].map((stat, i) => (
               <div key={i} style={{ background: '#111', padding: '20px 16px' }}>
                 <p style={{ fontSize: '10px', color: '#6b6b6b', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '10px', fontFamily: sans }}>{stat.label}</p>
-                <p style={{ fontSize: '28px', fontWeight: 400, color: i === 3 && viajesGratisDisponibles > 0 ? '#fbbf24' : '#fff', lineHeight: 1, fontFamily: serif }}>{stat.value}</p>
+                <p style={{ fontSize: '28px', fontWeight: 400, color: i === 3 && viajesGratisDisponibles > 0 ? '#D6CCC2' : '#fff', lineHeight: 1, fontFamily: serif }}>{stat.value}</p>
                 {i === 2 && <p style={{ fontSize: '11px', color: '#4a4a4a', marginTop: '6px', fontFamily: sans }}>{puntosParaSiguiente} pts para viaje gratis</p>}
               </div>
             ))}
           </div>
 
           {viajesGratisDisponibles > 0 && (
-            <div className="viaje-gratis-banner" style={{ marginTop: '16px', background: 'rgba(251,191,36,0.1)', border: '0.5px solid #fbbf2440', borderRadius: '10px', padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ marginTop: '16px', background: 'rgba(214,204,194,0.1)', border: '0.5px solid rgba(214,204,194,0.3)', borderRadius: '10px', padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
-                <p style={{ fontSize: '14px', fontWeight: 500, color: '#fbbf24', fontFamily: sans, marginBottom: '4px' }}>
+                <p style={{ fontSize: '14px', fontWeight: 500, color: '#D6CCC2', fontFamily: sans, marginBottom: '4px' }}>
                   Tienes {viajesGratisDisponibles} viaje{viajesGratisDisponibles > 1 ? 's' : ''} gratis disponible{viajesGratisDisponibles > 1 ? 's' : ''}
                 </p>
                 <p style={{ fontSize: '12px', color: '#6b6b6b', fontFamily: sans }}>Selecciona una ruta y aplica tu viaje gratis</p>
               </div>
-              <div style={{ background: '#fbbf24', color: '#1a1a1a', borderRadius: '8px', padding: '8px 16px', fontSize: '12px', fontWeight: 500, fontFamily: sans }}>
+              <div style={{ background: '#D6CCC2', color: '#1a1a1a', borderRadius: '8px', padding: '8px 16px', fontSize: '12px', fontWeight: 500, fontFamily: sans }}>
                 {viajesGratisDisponibles} disponible{viajesGratisDisponibles > 1 ? 's' : ''}
               </div>
             </div>
@@ -332,6 +332,7 @@ export default function PassengerDashboard() {
                   <div>
                     <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>ORIGEN</p>
                     <p style={{ fontSize: '13px', color: '#1a1a1a', fontWeight: 500, fontFamily: sans }}>{ruta.origen}</p>
+                    {ruta.punto_encuentro && <p style={{ fontSize: '11px', color: '#9E9890', marginTop: '2px', fontFamily: sans }}>📍 {ruta.punto_encuentro}</p>}
                   </div>
                   <div>
                     <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>DESTINO</p>
@@ -360,7 +361,7 @@ export default function PassengerDashboard() {
                     </button>
                     {viajesGratisDisponibles > 0 && ruta.puestos_disponibles > 0 && (
                       <button onClick={() => handleUsarViajeGratis(ruta.id)}
-                        style={{ background: '#fbbf24', color: '#1a1a1a', border: 'none', borderRadius: '8px', padding: '8px 14px', fontSize: '11px', cursor: 'pointer', fontFamily: sans, fontWeight: 500, whiteSpace: 'nowrap' as const }}>
+                        style={{ background: '#D6CCC2', color: '#1a1a1a', border: 'none', borderRadius: '8px', padding: '8px 14px', fontSize: '11px', cursor: 'pointer', fontFamily: sans, fontWeight: 500, whiteSpace: 'nowrap' as const }}>
                         Usar gratis
                       </button>
                     )}
