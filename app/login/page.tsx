@@ -68,20 +68,6 @@ export default function LoginPage() {
           <p style={{ fontSize: '14px', color: '#6b6b6b', lineHeight: 1.7, fontFamily: sans, fontWeight: 300, maxWidth: '320px' }}>
             Inicia sesion para acceder a tus rutas, reservas y puntos acumulados.
           </p>
-
-          {/* Banner conductor */}
-          <div style={{ marginTop: '32px', background: 'rgba(251,191,36,0.08)', border: '0.5px solid rgba(251,191,36,0.25)', borderRadius: '12px', padding: '20px 24px' }}>
-            <p style={{ fontSize: '11px', color: '#fbbf24', letterSpacing: '1.5px', textTransform: 'uppercase' as const, marginBottom: '10px', fontFamily: sans }}>¿Tienes carro?</p>
-            <p style={{ fontSize: '22px', fontWeight: 400, color: '#fff', fontFamily: serif, marginBottom: '10px', lineHeight: 1.2 }}>
-              Gana <em style={{ color: '#fbbf24', fontStyle: 'italic' }}>$4.000</em><br />por cada pasajero
-            </p>
-            <p style={{ fontSize: '12px', color: '#6b6b6b', fontFamily: sans, lineHeight: 1.6, marginBottom: '16px' }}>
-              Regístrate como conductor, publica tu ruta hacia la universidad y recibe una contribución de cada pasajero. Tú ya vas — nosotros te ayudamos a cubrir la gasolina.
-            </p>
-            <a href="/register" style={{ display: 'inline-block', background: '#fbbf24', color: '#1a1a1a', borderRadius: '8px', padding: '9px 20px', fontSize: '12px', fontWeight: 600, textDecoration: 'none', fontFamily: sans }}>
-              Registrarme como conductor →
-            </a>
-          </div>
         </div>
 
         <div style={{ display: 'flex', gap: '32px' }}>
