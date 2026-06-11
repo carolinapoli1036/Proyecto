@@ -5,7 +5,22 @@ export default function Home() {
   return (
     <div style={{ background: '#EDEDE9', minHeight: '100vh', flex: 1, fontFamily: sans, display: 'flex', flexDirection: 'column' }}>
 
-      <div style={{ background: '#1a1a1a', padding: '0 48px', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <style>{`
+        @media (max-width: 768px) {
+          .home-navbar { padding: 0 20px !important; }
+          .home-hero { padding: 60px 24px 80px !important; }
+          .home-hero h1 { font-size: 40px !important; letter-spacing: -0.5px !important; }
+          .home-badge { margin-bottom: 24px !important; }
+          .home-buttons { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; }
+          .home-stats { grid-template-columns: repeat(3, 1fr) !important; width: 100% !important; margin-top: 48px !important; }
+          .home-como { padding: 48px 24px !important; }
+          .home-cards { grid-template-columns: 1fr !important; gap: 16px !important; }
+          .home-cta { padding: 60px 24px !important; }
+          .home-cta h2 { font-size: 32px !important; }
+        }
+      `}</style>
+
+      <div className="home-navbar" style={{ background: '#1a1a1a', padding: '0 48px', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span style={{ fontSize: '15px', fontWeight: 500, color: '#fff', fontFamily: sans, letterSpacing: '0.3px' }}>CARPODRIVE</span>
         <div style={{ display: 'flex', gap: '12px' }}>
           <a href="/login" style={{ fontSize: '13px', color: '#9E9890', textDecoration: 'none', padding: '7px 16px', border: '0.5px solid #3a3a3a', borderRadius: '6px' }}>
@@ -17,13 +32,13 @@ export default function Home() {
         </div>
       </div>
 
-      <div style={{ background: '#1a1a1a', padding: '100px 48px 120px', position: 'relative', overflow: 'hidden', flex: 1 }}>
+      <div className="home-hero" style={{ background: '#1a1a1a', padding: '100px 48px 120px', position: 'relative', overflow: 'hidden', flex: 1 }}>
         <div style={{ position: 'absolute', top: '-100px', right: '-100px', width: '500px', height: '500px', borderRadius: '50%', border: '0.5px solid rgba(255,255,255,0.04)' }} />
         <div style={{ position: 'absolute', top: '-40px', right: '-40px', width: '350px', height: '350px', borderRadius: '50%', border: '0.5px solid rgba(255,255,255,0.06)' }} />
         <div style={{ position: 'absolute', bottom: '-80px', left: '30%', width: '300px', height: '300px', borderRadius: '50%', border: '0.5px solid rgba(255,255,255,0.04)' }} />
 
         <div style={{ maxWidth: '680px', position: 'relative', zIndex: 1 }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: '20px', padding: '6px 16px', marginBottom: '40px' }}>
+          <div className="home-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: '20px', padding: '6px 16px', marginBottom: '40px' }}>
             <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#D6CCC2', display: 'inline-block' }} />
             <span style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '1.5px', textTransform: 'uppercase' as const, fontFamily: sans }}>Carpooling universitario · Medellin</span>
           </div>
@@ -37,7 +52,7 @@ export default function Home() {
             Conectamos estudiantes universitarios de Medellín para compartir rutas, reducir costos y contribuir a la reducción de la congestión vehicular en la ciudad.
           </p>
 
-          <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+          <div className="home-buttons" style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
             <a href="/register" style={{ background: '#EDEDE9', color: '#1a1a1a', textDecoration: 'none', borderRadius: '10px', padding: '14px 32px', fontSize: '14px', fontWeight: 500, fontFamily: sans }}>
               Crear cuenta gratis
             </a>
@@ -47,7 +62,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 200px)', gap: '1px', background: 'rgba(255,255,255,0.06)', borderRadius: '14px', overflow: 'hidden', marginTop: '80px', width: 'fit-content' }}>
+        <div className="home-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 200px)', gap: '1px', background: 'rgba(255,255,255,0.06)', borderRadius: '14px', overflow: 'hidden', marginTop: '80px', width: 'fit-content' }}>
           {[
             { value: '100+', label: 'Estudiantes registrados' },
             { value: '16+', label: 'Universidades conectadas' },
@@ -61,9 +76,9 @@ export default function Home() {
         </div>
       </div>
 
-      <div style={{ background: '#EDEDE9', padding: '80px 48px' }}>
+      <div className="home-como" style={{ background: '#EDEDE9', padding: '80px 48px' }}>
         <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase' as const, marginBottom: '48px', fontFamily: sans }}>Como funciona</p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' }}>
+        <div className="home-cards" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' }}>
           {[
             { num: '01', title: 'Registrate', desc: 'Crea tu cuenta con tu correo universitario y selecciona tu perfil: conductor o pasajero.', highlight: false },
             { num: '02', title: 'Encuentra tu ruta', desc: 'Busca rutas disponibles desde tu estacion de metro o comuna hacia tu universidad.', highlight: false },
@@ -84,7 +99,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div style={{ background: '#1a1a1a', padding: '80px 48px', textAlign: 'center' as const }}>
+      <div className="home-cta" style={{ background: '#1a1a1a', padding: '80px 48px', textAlign: 'center' as const }}>
         <h2 style={{ fontSize: '42px', fontWeight: 400, color: '#fff', marginBottom: '16px', fontFamily: serif }}>
           Listo para <em style={{ fontStyle: 'italic', color: '#D6CCC2' }}>empezar?</em>
         </h2>
