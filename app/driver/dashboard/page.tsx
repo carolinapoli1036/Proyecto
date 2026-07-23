@@ -100,6 +100,14 @@ export default function DriverDashboard() {
       cargarReservasDeRuta(ruta_id);
     }
   };
+  const handleAbordaje = async (reserva_id: number, abordado: boolean) => {
+  await fetch('/api/reservas/abordaje', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ reserva_id, abordaje_confirmado: abordado }),
+  });
+  if (rutaExpandida) cargarReservasDeRuta(rutaExpandida);
+};
 
   const handlePublicar = async () => {
     setMensaje(''); setError('');
@@ -236,6 +244,7 @@ export default function DriverDashboard() {
         ))}
       </optgroup>
       <optgroup label="Universidades">
+        <option value="ESIC Business & Marketing School">ESIC</option>
         <option value="Universidad de Antioquia">U. de Antioquia</option>
         <option value="Universidad Nacional de Colombia">U. Nacional</option>
         <option value="Universidad EAFIT">EAFIT</option>
@@ -260,6 +269,7 @@ export default function DriverDashboard() {
     <>
       <option value="">Selecciona el destino</option>
       <optgroup label="Universidades">
+        <option value="ESIC Business & Marketing School">ESIC</option>
         <option value="Universidad de Antioquia">U. de Antioquia</option>
         <option value="Universidad Nacional de Colombia">U. Nacional</option>
         <option value="Universidad EAFIT">EAFIT</option>
@@ -276,6 +286,7 @@ export default function DriverDashboard() {
         <option value="Institución Universitaria Colegio Mayor">Colegio Mayor</option>
         <option value="Tecnológico de Antioquia">Tecnológico de Antioquia</option>
         <option value="SENA Regional Antioquia">SENA</option>
+        
       </optgroup>
       <optgroup label="Estaciones Metro">
         {['Caribe','Universidad','El Poblado','San Antonio','Niquía','Acevedo','Industriales','Aguacatala','Ayurá','Envigado','Itagüí','La Estrella','Sabaneta'].map(e => (
@@ -584,9 +595,27 @@ export default function DriverDashboard() {
                           <p style={{ fontSize: '10px', color: '#9E9890', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '4px', fontFamily: sans }}>Pasajeros</p>
                           {reservasPorRuta[ruta.id].map((res: any) => (
                             <div key={res.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#fff', border: '0.5px solid #EDEDE9', borderRadius: '8px', padding: '10px 16px' }}>
-                              <div>
-                                <p style={{ fontSize: '13px', color: '#1a1a1a', fontWeight: 500, fontFamily: sans }}>{res.pasajero_nombre}</p>
-                                <p style={{ fontSize: '11px', color: '#9E9890', fontFamily: sans }}>{res.estado}</p>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                {ruta.estado === 'activa' && (
+                                  <input
+                                    type="checkbox"
+                                    checked={!!res.abordaje_confirmado}
+                                    onChange={e => handleAbordaje(res.id, e.target.checked)}
+                                    title="Confirmar abordaje"
+                                    style={{ width: '18px', height: '18px', accentColor: '#1a1a1a', cursor: 'pointer' }}
+                                  />
+                                )}
+                                <div>
+                                  <p style={{ fontSize: '13px', color: '#1a1a1a', fontWeight: 500, fontFamily: sans }}>{res.pasajero_nombre}</p>
+                                  <p style={{ fontSize: '11px', color: '#9E9890', fontFamily: sans }}>
+                                    {res.estado}
+                                    {ruta.estado === 'activa' && (
+                                      <span style={{ marginLeft: '8px', color: res.abordaje_confirmado ? '#065f46' : '#9E9890' }}>
+                                        {res.abordaje_confirmado ? '✓ Abordó' : '· Pendiente'}
+                                      </span>
+                                    )}
+                                  </p>
+                                </div>
                               </div>
                               {res.estado === 'confirmada' && (
                                 <button onClick={() => setChatReserva({ ...res, origen: ruta.origen, destino: ruta.destino })}
@@ -605,6 +634,9 @@ export default function DriverDashboard() {
             </div>
           )}
         </div>
+
+        
+
 
         {/* Buscar ruta como pasajero */}
         <div className="card" style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '20px' }}>

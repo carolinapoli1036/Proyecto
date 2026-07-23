@@ -156,6 +156,7 @@ export default function PassengerDashboard() {
         ))}
       </optgroup>
       <optgroup label="Universidades">
+        <option value="ESIC Business & Marketing School">ESIC</option>
         <option value="Universidad de Antioquia">U. de Antioquia</option>
         <option value="Universidad Nacional de Colombia">U. Nacional</option>
         <option value="Universidad EAFIT">EAFIT</option>
@@ -172,6 +173,7 @@ export default function PassengerDashboard() {
         <option value="Institución Universitaria Colegio Mayor">Colegio Mayor</option>
         <option value="Tecnológico de Antioquia">Tecnológico de Antioquia</option>
         <option value="SENA Regional Antioquia">SENA</option>
+        
       </optgroup>
     </>
   );
@@ -180,6 +182,7 @@ export default function PassengerDashboard() {
     <>
       <option value="">Todos los destinos</option>
       <optgroup label="Universidades">
+        <option value="ESIC Business & Marketing School">ESIC</option>
         <option value="Universidad de Antioquia">U. de Antioquia</option>
         <option value="Universidad Nacional de Colombia">U. Nacional</option>
         <option value="Universidad EAFIT">EAFIT</option>

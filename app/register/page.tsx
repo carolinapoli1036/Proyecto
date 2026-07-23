@@ -184,6 +184,7 @@ export default function RegisterPage() {
               <select style={inputStyle} value={form.universidad} onChange={e => setForm({ ...form, universidad: e.target.value })}>
                 <option value="">Selecciona tu universidad</option>
                 <optgroup label="Universidades">
+                  <option value="ESIC Business & Marketing School">ESIC</option>
                   <option value="Universidad de Antioquia">Universidad de Antioquia</option>
                   <option value="Universidad Nacional de Colombia">Universidad Nacional</option>
                   <option value="Universidad EAFIT">Universidad EAFIT</option>
