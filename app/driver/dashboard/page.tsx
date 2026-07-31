@@ -22,7 +22,7 @@ export default function DriverDashboard() {
   const [misReservasComoP, setMisReservasComoP] = useState<any[]>([]);
 
   const [formRuta, setFormRuta] = useState({
-    tipo_origen: '', origen: '', destino: '', hora_salida: '', puestos: 4, fecha: '', punto_encuentro: '',
+    tipo_origen: '', origen: '', destino: '', hora_salida: '', puestos: 4, fecha: '', punto_encuentro: '', contribucion: 7000,
   });
 
   const [formVehiculo, setFormVehiculo] = useState({
@@ -100,19 +100,23 @@ export default function DriverDashboard() {
       cargarReservasDeRuta(ruta_id);
     }
   };
+
   const handleAbordaje = async (reserva_id: number, abordado: boolean) => {
-  await fetch('/api/reservas/abordaje', {
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ reserva_id, abordaje_confirmado: abordado }),
-  });
-  if (rutaExpandida) cargarReservasDeRuta(rutaExpandida);
-};
+    await fetch('/api/reservas/abordaje', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reserva_id, abordaje_confirmado: abordado }),
+    });
+    if (rutaExpandida) cargarReservasDeRuta(rutaExpandida);
+  };
 
   const handlePublicar = async () => {
     setMensaje(''); setError('');
     if (!formRuta.origen || !formRuta.destino || !formRuta.hora_salida || !formRuta.fecha) {
       setError('Por favor completa todos los campos incluyendo la fecha'); return;
+    }
+    if (formRuta.contribucion < 7000) {
+      setError('La contribución mínima es $7.000'); return;
     }
     const res = await fetch('/api/rutas', {
       method: 'POST',
@@ -123,7 +127,7 @@ export default function DriverDashboard() {
     if (res.ok) {
       setMensaje('Ruta publicada exitosamente');
       cargarRutas(usuario.id);
-      setFormRuta({ tipo_origen: '', origen: '', destino: '', hora_salida: '', puestos: 4, fecha: '', punto_encuentro: '' });
+      setFormRuta({ tipo_origen: '', origen: '', destino: '', hora_salida: '', puestos: 4, fecha: '', punto_encuentro: '', contribucion: 7000 });
     } else { setError(data.error); }
   };
 
@@ -286,7 +290,6 @@ export default function DriverDashboard() {
         <option value="Institución Universitaria Colegio Mayor">Colegio Mayor</option>
         <option value="Tecnológico de Antioquia">Tecnológico de Antioquia</option>
         <option value="SENA Regional Antioquia">SENA</option>
-        
       </optgroup>
       <optgroup label="Estaciones Metro">
         {['Caribe','Universidad','El Poblado','San Antonio','Niquía','Acevedo','Industriales','Aguacatala','Ayurá','Envigado','Itagüí','La Estrella','Sabaneta'].map(e => (
@@ -492,7 +495,7 @@ export default function DriverDashboard() {
         {/* Publicar ruta */}
         <div className="card" style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '20px' }}>
           <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>Publicar nueva ruta</p>
-          <div className="form-ruta-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto auto auto', gap: '16px', alignItems: 'flex-end', marginBottom: '16px' }}>
+          <div className="form-ruta-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto auto auto auto', gap: '16px', alignItems: 'flex-end', marginBottom: '16px' }}>
             <div>
               <label style={labelStyle}>Origen</label>
               <select style={inputStyle} value={formRuta.origen} onChange={e => setFormRuta({ ...formRuta, origen: e.target.value })}>
@@ -519,6 +522,21 @@ export default function DriverDashboard() {
               <label style={labelStyle}>Puestos</label>
               <input type="number" min="1" max="4" style={{ ...inputStyle, width: '70px' }} value={formRuta.puestos}
                 onChange={e => setFormRuta({ ...formRuta, puestos: parseInt(e.target.value) })} />
+            </div>
+            <div>
+              <label style={labelStyle}>Contribución ($)</label>
+              <input
+                type="number"
+                min="7000"
+                step="500"
+                style={{ ...inputStyle, width: '110px' }}
+                value={formRuta.contribucion}
+                onChange={e => {
+                  const val = parseInt(e.target.value);
+                  setFormRuta({ ...formRuta, contribucion: isNaN(val) ? 7000 : val });
+                }}
+              />
+              <p style={{ fontSize: '10px', color: '#9E9890', marginTop: '4px', fontFamily: sans }}>Mín. $7.000</p>
             </div>
             <button onClick={handlePublicar} style={{ background: '#1a1a1a', color: '#fff', border: 'none', borderRadius: '8px', padding: '10px 24px', fontSize: '13px', cursor: 'pointer', fontFamily: sans, whiteSpace: 'nowrap' }}>Publicar</button>
           </div>
@@ -635,9 +653,6 @@ export default function DriverDashboard() {
           )}
         </div>
 
-        
-
-
         {/* Buscar ruta como pasajero */}
         <div className="card" style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '20px' }}>
           <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>Buscar ruta como pasajero</p>
@@ -689,7 +704,9 @@ export default function DriverDashboard() {
                   </div>
                   <div>
                     <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>CONTRIBUCIÓN</p>
-                    <p style={{ fontSize: '13px', color: '#1a1a1a', fontWeight: 500, fontFamily: serif }}>$4.000</p>
+                    <p style={{ fontSize: '13px', color: '#1a1a1a', fontWeight: 500, fontFamily: serif }}>
+                      ${(ruta.contribucion || 7000).toLocaleString('es-CO')}
+                    </p>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                     <button onClick={() => handleReservar(ruta.id)} disabled={ruta.puestos_disponibles === 0}

@@ -24,10 +24,15 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const { conductor_id, origen, destino, hora_salida, puestos, tipo_origen, fecha, punto_encuentro } = await request.json();
+    const { conductor_id, origen, destino, hora_salida, puestos, tipo_origen, fecha, punto_encuentro, contribucion } = await request.json();
 
     if (!conductor_id || !origen || !destino || !hora_salida || !fecha) {
       return NextResponse.json({ error: 'Faltan campos requeridos' }, { status: 400 });
+    }
+
+    const contribucionFinal = contribucion ? parseInt(contribucion) : 7000;
+    if (contribucionFinal < 7000) {
+      return NextResponse.json({ error: 'La contribución mínima es $7.000' }, { status: 400 });
     }
 
     const ahoraColombia = new Date(Date.now() - 5 * 60 * 60 * 1000);
@@ -38,9 +43,9 @@ export async function POST(request: Request) {
     }
 
     await db.execute(
-      `INSERT INTO rutas (conductor_id, tipo_origen, origen, destino, hora_salida, puestos_disponibles, puestos_totales, estado, fecha, punto_encuentro)
-       VALUES (?, ?, ?, ?, ?, ?, ?, 'activa', ?, ?)`,
-      [conductor_id, tipo_origen, origen, destino, hora_salida, puestos, puestos, fecha, punto_encuentro || null]
+      `INSERT INTO rutas (conductor_id, tipo_origen, origen, destino, hora_salida, puestos_disponibles, puestos_totales, estado, fecha, punto_encuentro, contribucion)
+       VALUES (?, ?, ?, ?, ?, ?, ?, 'activa', ?, ?, ?)`,
+      [conductor_id, tipo_origen, origen, destino, hora_salida, puestos, puestos, fecha, punto_encuentro || null, contribucionFinal]
     );
 
     return NextResponse.json({ mensaje: 'Ruta publicada exitosamente' }, { status: 201 });
