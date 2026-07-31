@@ -13,6 +13,8 @@ export default function PassengerDashboard() {
   const [error, setError] = useState('');
   const [filtro, setFiltro] = useState({ origen: '', destino: '' });
   const [chatReserva, setChatReserva] = useState<any>(null);
+  // Estado para manejar contribucion voluntaria por ruta
+  const [contribuciones, setContribuciones] = useState<Record<number, number>>({});
 
   const serif = "'DM Serif Display', Georgia, serif";
   const sans = "'DM Sans', system-ui, sans-serif";
@@ -45,7 +47,13 @@ export default function PassengerDashboard() {
     if (destino) params.append('destino', destino);
     const res = await fetch(`/api/rutas/disponibles?${params}`);
     const data = await res.json();
-    if (Array.isArray(data)) setRutas(data);
+    if (Array.isArray(data)) {
+      setRutas(data);
+      // Inicializar contribuciones con el minimo de cada ruta
+      const contribs: Record<number, number> = {};
+      data.forEach((r: any) => { contribs[r.id] = r.contribucion || 7000; });
+      setContribuciones(contribs);
+    }
   };
 
   const cargarReservas = async (pasajero_id: number) => {
@@ -56,10 +64,14 @@ export default function PassengerDashboard() {
 
   const handleReservar = async (ruta_id: number) => {
     setMensaje(''); setError('');
+    const contribucion = contribuciones[ruta_id] || 7000;
+    if (contribucion < 7000) {
+      setError('La contribución mínima es $7.000'); return;
+    }
     const res = await fetch('/api/reservas', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ruta_id, pasajero_id: usuario.id }),
+      body: JSON.stringify({ ruta_id, pasajero_id: usuario.id, contribucion_pasajero: contribucion }),
     });
     const data = await res.json();
     if (res.ok) {
@@ -136,6 +148,7 @@ export default function PassengerDashboard() {
   };
 
   const selectStyle: React.CSSProperties = { background: '#FAFAF8', border: '0.5px solid #D6CCC2', borderRadius: '8px', padding: '11px 14px', fontSize: '13px', color: '#1a1a1a', width: '100%', outline: 'none', fontFamily: sans };
+  const inputStyle: React.CSSProperties = { background: '#FAFAF8', border: '0.5px solid #D6CCC2', borderRadius: '8px', padding: '8px 10px', fontSize: '12px', color: '#1a1a1a', outline: 'none', fontFamily: sans, width: '90px' };
 
   const origenOptions = (
     <>
@@ -173,7 +186,6 @@ export default function PassengerDashboard() {
         <option value="Institución Universitaria Colegio Mayor">Colegio Mayor</option>
         <option value="Tecnológico de Antioquia">Tecnológico de Antioquia</option>
         <option value="SENA Regional Antioquia">SENA</option>
-        
       </optgroup>
     </>
   );
@@ -331,7 +343,7 @@ export default function PassengerDashboard() {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
               {rutas.map((ruta: any) => (
-                <div className="ruta-card" key={ruta.id} style={{ display: 'grid', gridTemplateColumns: '1.5fr 1.5fr 1fr 80px 80px 90px auto', gap: '16px', alignItems: 'center', padding: '18px 20px', background: '#FAFAF8', border: '0.5px solid #EDEDE9', borderRadius: '10px' }}>
+                <div className="ruta-card" key={ruta.id} style={{ display: 'grid', gridTemplateColumns: '1.5fr 1.5fr 1fr 80px 80px 140px auto', gap: '16px', alignItems: 'center', padding: '18px 20px', background: '#FAFAF8', border: '0.5px solid #EDEDE9', borderRadius: '10px' }}>
                   <div>
                     <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>ORIGEN</p>
                     <p style={{ fontSize: '13px', color: '#1a1a1a', fontWeight: 500, fontFamily: sans }}>{ruta.origen}</p>
@@ -354,8 +366,23 @@ export default function PassengerDashboard() {
                     <p style={{ fontSize: '13px', color: '#1a1a1a', fontFamily: sans }}>{ruta.puestos_disponibles}</p>
                   </div>
                   <div>
-                    <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>CONTRIBUCIÓN</p>
-                    <p style={{ fontSize: '13px', color: '#1a1a1a', fontWeight: 500, fontFamily: serif }}>$4.000</p>
+                    <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>MI CONTRIBUCIÓN</p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <span style={{ fontSize: '12px', color: '#9E9890', fontFamily: sans }}>$</span>
+                      <input
+                        type="number"
+                        min={ruta.contribucion || 7000}
+                        step="500"
+                        style={inputStyle}
+                        value={contribuciones[ruta.id] || ruta.contribucion || 7000}
+                        onChange={e => {
+                          const val = parseInt(e.target.value);
+                          const min = ruta.contribucion || 7000;
+                          setContribuciones(prev => ({ ...prev, [ruta.id]: isNaN(val) ? min : val }));
+                        }}
+                      />
+                    </div>
+                    <p style={{ fontSize: '10px', color: '#9E9890', marginTop: '3px', fontFamily: sans }}>Mín. ${(ruta.contribucion || 7000).toLocaleString('es-CO')}</p>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                     <button onClick={() => handleReservar(ruta.id)} disabled={ruta.puestos_disponibles === 0}
@@ -395,7 +422,9 @@ export default function PassengerDashboard() {
                   <div>
                     <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>CONTRIBUCIÓN</p>
                     <p style={{ fontSize: '13px', color: '#1a1a1a', fontWeight: 500, fontFamily: serif }}>
-                      {reserva.estado === 'confirmada' ? '$4.000' : reserva.estado === 'completada' ? '$4.000 ✓' : '—'}
+                      {reserva.estado !== 'cancelada'
+                        ? `$${(reserva.contribucion_pasajero || 7000).toLocaleString('es-CO')}${reserva.estado === 'completada' ? ' ✓' : ''}`
+                        : '—'}
                     </p>
                   </div>
                   <div>{badgeEstado(reserva.estado)}</div>
