@@ -525,19 +525,11 @@ export default function DriverDashboard() {
             </div>
             <div>
               <label style={labelStyle}>Contribución ($)</label>
-              <input
-                type="number"
-                min="7000"
-                step="500"
-                style={{ ...inputStyle, width: '110px' }}
-                value={formRuta.contribucion}
-                onChange={e => {
-                  const val = parseInt(e.target.value);
-                  setFormRuta({ ...formRuta, contribucion: isNaN(val) ? 7000 : val });
-                }}
-              />
-              <p style={{ fontSize: '10px', color: '#9E9890', marginTop: '4px', fontFamily: sans }}>Mín. $7.000</p>
-            </div>
+              <div style={{ ...inputStyle, width: '110px', display: 'flex', alignItems: 'center', background: '#EDEDE9', fontWeight: 500 }}>
+                $7.000
+              </div>
+            <p style={{ fontSize: '10px', color: '#9E9890', marginTop: '4px', fontFamily: sans }}>Tarifa fija</p>
+        </div>
             <button onClick={handlePublicar} style={{ background: '#1a1a1a', color: '#fff', border: 'none', borderRadius: '8px', padding: '10px 24px', fontSize: '13px', cursor: 'pointer', fontFamily: sans, whiteSpace: 'nowrap' }}>Publicar</button>
           </div>
           <div>
