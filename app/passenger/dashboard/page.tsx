@@ -13,6 +13,9 @@ export default function PassengerDashboard() {
   const [error, setError] = useState('');
   const [filtro, setFiltro] = useState({ origen: '', destino: '' });
   const [chatReserva, setChatReserva] = useState<any>(null);
+  const [modalCalificacion, setModalCalificacion] = useState<any>(null);
+  const [formCalif, setFormCalif] = useState({ estrellas: 0, comentario: '' });
+  const [yaCalificado, setYaCalificado] = useState<Record<number, boolean>>({});
   // Estado para manejar contribucion voluntaria por ruta
   const [contribuciones, setContribuciones] = useState<Record<number, number>>({});
 
@@ -57,10 +60,11 @@ export default function PassengerDashboard() {
   };
 
   const cargarReservas = async (pasajero_id: number) => {
-    const res = await fetch(`/api/reservas?pasajero_id=${pasajero_id}`);
-    const data = await res.json();
-    if (Array.isArray(data)) setMisReservas(data);
-  };
+  const res = await fetch(`/api/reservas?pasajero_id=${pasajero_id}`);
+  const data = await res.json();
+  console.log('RESERVAS:', data); // agrega esto
+  if (Array.isArray(data)) setMisReservas(data);
+};
 
   const handleReservar = async (ruta_id: number) => {
     setMensaje(''); setError('');
@@ -132,6 +136,34 @@ export default function PassengerDashboard() {
       cargarReservas(usuario.id);
     } else { setError(data.error); }
   };
+  const handleCalificar = async () => {
+  console.log('Modal:', modalCalificacion);
+  console.log('Form:', formCalif);
+  console.log('Usuario:', usuario?.id);
+  
+  if (formCalif.estrellas === 0) { setError('Selecciona una calificación'); return; }
+
+    const res = await fetch('/api/calificaciones', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        reserva_id: modalCalificacion.reserva_id,
+        calificador_id: usuario.id,
+        calificado_id: modalCalificacion.conductor_id,
+        estrellas: formCalif.estrellas,
+        comentario: formCalif.comentario,
+      }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      setMensaje('Calificación enviada');
+      setModalCalificacion(null);
+      setFormCalif({ estrellas: 0, comentario: '' });
+      setYaCalificado(prev => ({ ...prev, [modalCalificacion.reserva_id]: true }));
+    } else { setError(data.error); }
+  };
+
+
 
   const viajesCompletados = misReservas.filter(r => r.estado === 'completada').length;
   const proximoViaje = misReservas.filter(r => r.estado === 'confirmada')[0];
@@ -225,8 +257,47 @@ export default function PassengerDashboard() {
     </>
   );
 
+  
   return (
     <div style={{ background: '#EDEDE9', minHeight: '100vh', flex: 1, fontFamily: sans }}>
+
+      {/* Modal de calificación — agrégalo aquí */}
+      {modalCalificacion && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ background: '#fff', borderRadius: '16px', padding: '32px', width: '400px', maxWidth: '90vw' }}>
+            <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '8px', fontFamily: sans }}>Calificar conductor</p>
+            <p style={{ fontSize: '16px', fontWeight: 500, color: '#1a1a1a', marginBottom: '20px', fontFamily: sans }}>{modalCalificacion.conductor_nombre}</p>
+            <p style={{ fontSize: '12px', color: '#9E9890', marginBottom: '10px', fontFamily: sans }}>Ruta: {modalCalificacion.origen} → {modalCalificacion.destino}</p>
+            <p style={{ fontSize: '11px', color: '#9E9890', marginBottom: '8px', fontFamily: sans }}>Tu calificación</p>
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
+              {[1,2,3,4,5].map(n => (
+                <button key={n} onClick={() => setFormCalif(prev => ({ ...prev, estrellas: n }))}
+                  style={{ fontSize: '28px', background: 'none', border: 'none', cursor: 'pointer', opacity: formCalif.estrellas >= n ? 1 : 0.3 }}>
+                  ⭐
+                </button>
+              ))}
+            </div>
+            <p style={{ fontSize: '11px', color: '#9E9890', marginBottom: '8px', fontFamily: sans }}>Comentario (opcional)</p>
+            <textarea
+              value={formCalif.comentario}
+              onChange={e => setFormCalif(prev => ({ ...prev, comentario: e.target.value }))}
+              placeholder="¿Cómo fue el viaje?"
+              style={{ width: '100%', height: '80px', borderRadius: '8px', border: '0.5px solid #D6CCC2', padding: '10px', fontSize: '13px', fontFamily: sans, resize: 'none', outline: 'none', boxSizing: 'border-box' as const }}
+            />
+            <div style={{ display: 'flex', gap: '10px', marginTop: '16px' }}>
+              <button onClick={handleCalificar}
+                style={{ flex: 1, background: '#1a1a1a', color: '#fff', border: 'none', borderRadius: '8px', padding: '11px', fontSize: '13px', cursor: 'pointer', fontFamily: sans }}>
+                Enviar calificación
+              </button>
+              <button onClick={() => { setModalCalificacion(null); setFormCalif({ estrellas: 0, comentario: '' }); }}
+                style={{ background: '#EDEDE9', color: '#1a1a1a', border: 'none', borderRadius: '8px', padding: '11px 20px', fontSize: '13px', cursor: 'pointer', fontFamily: sans }}>
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
 
       {chatReserva && usuario && (
         <Chat
@@ -443,6 +514,20 @@ export default function PassengerDashboard() {
                         Cancelar
                       </button>
                     )}
+                  </div>
+                  <div>
+                 {reserva.estado === 'completada' && !yaCalificado[reserva.id] && (
+                    <button onClick={() => setModalCalificacion({
+                      reserva_id: reserva.id,
+                      conductor_id: reserva.conductor_id,
+                      conductor_nombre: reserva.conductor_nombre,
+                      origen: reserva.origen,
+                      destino: reserva.destino,
+                    })}
+                        style={{ background: '#fbbf24', color: '#1a1a1a', border: 'none', borderRadius: '8px', padding: '8px 16px', fontSize: '12px', cursor: 'pointer', fontFamily: sans, whiteSpace: 'nowrap' as const }}>
+                        ⭐ Calificar
+                        </button>
+                     )}
                   </div>
                   <div>
                     {reserva.estado === 'confirmada' && (

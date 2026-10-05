@@ -3,6 +3,7 @@ export default function Home() {
   const sans = "'DM Sans', system-ui, sans-serif";
 
   return (
+    
     <div style={{ background: '#EDEDE9', minHeight: '100vh', flex: 1, fontFamily: sans, display: 'flex', flexDirection: 'column' }}>
 
       <style>{`

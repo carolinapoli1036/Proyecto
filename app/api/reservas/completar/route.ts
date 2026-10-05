@@ -9,11 +9,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'reserva_id es requerido' }, { status: 400 });
     }
 
-    // Obtener la reserva para saber el pasajero
-    const [reservas]: any = await db.execute(
-      'SELECT * FROM reservas WHERE id = ? AND estado = ?',
-      [reserva_id, 'confirmada']
-    );
+   const [reservas]: any = await db.execute(
+  `SELECT res.*, r.conductor_id 
+   FROM reservas res 
+   JOIN rutas r ON res.ruta_id = r.id 
+   WHERE res.id = ? AND res.estado = 'confirmada'`,
+  [reserva_id]
+);
 
     if (reservas.length === 0) {
       return NextResponse.json({ error: 'Reserva no encontrada o ya completada' }, { status: 404 });

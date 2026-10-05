@@ -58,12 +58,13 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const pasajero_id = searchParams.get('pasajero_id');
     const [rows]: any = await db.execute(
-      `SELECT res.*, r.origen, r.destino, r.hora_salida, r.contribucion, u.nombre as conductor_nombre
-       FROM reservas res
-       JOIN rutas r ON res.ruta_id = r.id
-       JOIN usuarios u ON r.conductor_id = u.id
-       WHERE res.pasajero_id = ?
-       ORDER BY res.creado_en DESC`,
+      `SELECT res.*, r.origen, r.destino, r.hora_salida, r.contribucion, 
+        r.conductor_id as conductor_id, u.nombre as conductor_nombre,pasajero_id
+        FROM reservas res
+        JOIN rutas r ON res.ruta_id = r.id
+        JOIN usuarios u ON r.conductor_id = u.id
+        WHERE res.pasajero_id = ?
+        ORDER BY res.creado_en DESC`,
       [pasajero_id]
     );
     return NextResponse.json(rows);

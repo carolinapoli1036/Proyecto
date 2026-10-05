@@ -5,14 +5,14 @@ export async function POST() {
   try {
     // Rutas expiradas sin pasajeros → cancelada
     await db.execute(`
-      UPDATE rutas 
-      SET estado = 'cancelada'
-      WHERE estado = 'activa'
-      AND TIMESTAMP(fecha, hora_salida) < NOW() + INTERVAL 5 HOUR
-      AND id NOT IN (
-        SELECT DISTINCT ruta_id FROM reservas WHERE estado = 'confirmada'
-      )
-    `);
+    UPDATE rutas 
+    SET estado = 'cancelada'
+    WHERE estado = 'activa'
+    AND TIMESTAMP(fecha, hora_salida) < NOW() - INTERVAL 5 HOUR
+    AND id NOT IN (
+    SELECT DISTINCT ruta_id FROM reservas WHERE estado = 'confirmada'
+    )
+  `);
 
     // Rutas expiradas con pasajeros → completada
     const [rutasExpiradas]: any = await db.execute(`
@@ -21,7 +21,7 @@ export async function POST() {
       JOIN reservas res ON res.ruta_id = r.id
       WHERE r.estado = 'activa'
       AND res.estado = 'confirmada'
-      AND TIMESTAMP(r.fecha, r.hora_salida) < NOW() + INTERVAL 5 HOUR
+      AND TIMESTAMP(r.fecha, r.hora_salida) < NOW() - INTERVAL 5 HOUR
     `);
 
     for (const ruta of rutasExpiradas) {

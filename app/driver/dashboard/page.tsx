@@ -21,6 +21,23 @@ export default function DriverDashboard() {
   const [filtro, setFiltro] = useState({ origen: '', destino: '' });
   const [misReservasComoP, setMisReservasComoP] = useState<any[]>([]);
 
+  // ── FUNCIONALIDAD: Calificaciones ─────────────────────────────────
+  // Estados para el modal de calificación del conductor hacia el pasajero
+  const [modalCalifConductor, setModalCalifConductor] = useState<any>(null);
+  const [formCalifConductor, setFormCalifConductor] = useState({ estrellas: 0, comentario: '' });
+  const [yaCalificadoConductor, setYaCalificadoConductor] = useState<Record<number, boolean>>({});
+  // ─────────────────────────────────────────────────────────────────
+
+  // ── FUNCIONALIDAD: Rutas Recurrentes ──────────────────────────────
+  // Estados para gestionar rutas que se publican automáticamente cada semana
+  const [rutasRecurrentes, setRutasRecurrentes] = useState<any[]>([]);
+  const [mostrarFormRecurrente, setMostrarFormRecurrente] = useState(false);
+  const [formRecurrente, setFormRecurrente] = useState({
+    origen: '', destino: '', hora_salida: '', puestos: 4, punto_encuentro: '',
+    dias_semana: [] as number[],
+  });
+  // ─────────────────────────────────────────────────────────────────
+
   const [formRuta, setFormRuta] = useState({
     tipo_origen: '', origen: '', destino: '', hora_salida: '', puestos: 4, fecha: '', punto_encuentro: '', contribucion: 7000,
   });
@@ -44,6 +61,10 @@ export default function DriverDashboard() {
       cargarPuntos(user.id);
       cargarRutasDisponibles();
       cargarReservasComoP(user.id);
+      // ── NUEVO: cargar rutas recurrentes y generar las del día ──
+      cargarRutasRecurrentes(user.id);
+      fetch('/api/rutas-recurrentes/generar', { method: 'POST' });
+      // ──────────────────────────────────────────────────────────
     }
   }, []);
 
@@ -87,6 +108,7 @@ export default function DriverDashboard() {
   const cargarReservasDeRuta = async (ruta_id: number) => {
     const res = await fetch(`/api/reservas/ruta?ruta_id=${ruta_id}`);
     const data = await res.json();
+    console.log('RESERVAS DE RUTA:', data);
     if (Array.isArray(data)) {
       setReservasPorRuta(prev => ({ ...prev, [ruta_id]: data }));
     }
@@ -203,6 +225,89 @@ export default function DriverDashboard() {
     localStorage.setItem('usuario', JSON.stringify(updated));
     setUsuario(updated);
   };
+
+  // ── FUNCIONALIDAD: Calificaciones ─────────────────────────────────
+  // Función para que el conductor envíe la calificación al pasajero
+  const handleCalificarPasajero = async () => {
+    if (formCalifConductor.estrellas === 0) { setError('Selecciona una calificación'); return; }
+    setMensaje(''); setError('');
+    const res = await fetch('/api/calificaciones', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        reserva_id: modalCalifConductor.reserva_id,
+        calificador_id: usuario.id,
+        calificado_id: modalCalifConductor.pasajero_id,
+        estrellas: formCalifConductor.estrellas,
+        comentario: formCalifConductor.comentario,
+      }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      setMensaje('Calificación enviada');
+      setModalCalifConductor(null);
+      setFormCalifConductor({ estrellas: 0, comentario: '' });
+      setYaCalificadoConductor(prev => ({ ...prev, [modalCalifConductor.reserva_id]: true }));
+    } else { setError(data.error); }
+  };
+  // ─────────────────────────────────────────────────────────────────
+
+  // ── FUNCIONALIDAD: Rutas Recurrentes ──────────────────────────────
+  // Carga las rutas recurrentes del conductor desde la BD
+  const cargarRutasRecurrentes = async (conductor_id: number) => {
+    const res = await fetch(`/api/rutas-recurrentes?conductor_id=${conductor_id}`);
+    const data = await res.json();
+    if (Array.isArray(data)) setRutasRecurrentes(data);
+  };
+
+  // Crea una nueva ruta recurrente con los días seleccionados
+  const handleCrearRecurrente = async () => {
+    setMensaje(''); setError('');
+    if (!formRecurrente.origen || !formRecurrente.destino || !formRecurrente.hora_salida || formRecurrente.dias_semana.length === 0) {
+      setError('Completa todos los campos y selecciona al menos un día'); return;
+    }
+    const res = await fetch('/api/rutas-recurrentes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...formRecurrente, conductor_id: usuario.id }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      setMensaje('Ruta recurrente creada. Se publicará automáticamente los días seleccionados.');
+      setMostrarFormRecurrente(false);
+      setFormRecurrente({ origen: '', destino: '', hora_salida: '', puestos: 4, punto_encuentro: '', dias_semana: [] });
+      cargarRutasRecurrentes(usuario.id);
+      cargarRutas(usuario.id);
+    } else { setError(data.error); }
+  };
+
+  // Pausa o activa una ruta recurrente
+  const handleToggleRecurrente = async (id: number, activa: boolean) => {
+    await fetch('/api/rutas-recurrentes', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, activa }),
+    });
+    cargarRutasRecurrentes(usuario.id);
+  };
+
+  // Elimina una ruta recurrente permanentemente
+  const handleEliminarRecurrente = async (id: number) => {
+    if (!confirm('¿Eliminar esta ruta recurrente?')) return;
+    await fetch(`/api/rutas-recurrentes?id=${id}`, { method: 'DELETE' });
+    cargarRutasRecurrentes(usuario.id);
+  };
+
+  // Agrega o quita un día del selector de días de la semana
+  const toggleDia = (dia: number) => {
+    setFormRecurrente(prev => ({
+      ...prev,
+      dias_semana: prev.dias_semana.includes(dia)
+        ? prev.dias_semana.filter(d => d !== dia)
+        : [...prev.dias_semana, dia],
+    }));
+  };
+  // ─────────────────────────────────────────────────────────────────
 
   const formatFecha = (fecha: string) => {
     if (!fecha) return '—';
@@ -336,6 +441,43 @@ export default function DriverDashboard() {
           onCerrar={() => setChatReserva(null)}
         />
       )}
+
+      {/* ── FUNCIONALIDAD: Modal de calificación del conductor al pasajero ── */}
+      {modalCalifConductor && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ background: '#fff', borderRadius: '16px', padding: '32px', width: '400px', maxWidth: '90vw' }}>
+            <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '8px', fontFamily: sans }}>Calificar pasajero</p>
+            <p style={{ fontSize: '16px', fontWeight: 500, color: '#1a1a1a', marginBottom: '20px', fontFamily: sans }}>{modalCalifConductor.pasajero_nombre}</p>
+            <p style={{ fontSize: '11px', color: '#9E9890', marginBottom: '8px', fontFamily: sans }}>Tu calificación</p>
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
+              {[1,2,3,4,5].map(n => (
+                <button key={n} onClick={() => setFormCalifConductor(prev => ({ ...prev, estrellas: n }))}
+                  style={{ fontSize: '28px', background: 'none', border: 'none', cursor: 'pointer', opacity: formCalifConductor.estrellas >= n ? 1 : 0.3 }}>
+                  ⭐
+                </button>
+              ))}
+            </div>
+            <p style={{ fontSize: '11px', color: '#9E9890', marginBottom: '8px', fontFamily: sans }}>Comentario (opcional)</p>
+            <textarea
+              value={formCalifConductor.comentario}
+              onChange={e => setFormCalifConductor(prev => ({ ...prev, comentario: e.target.value }))}
+              placeholder="¿Cómo fue el pasajero?"
+              style={{ width: '100%', height: '80px', borderRadius: '8px', border: '0.5px solid #D6CCC2', padding: '10px', fontSize: '13px', fontFamily: sans, resize: 'none', outline: 'none', boxSizing: 'border-box' as const }}
+            />
+            <div style={{ display: 'flex', gap: '10px', marginTop: '16px' }}>
+              <button onClick={handleCalificarPasajero}
+                style={{ flex: 1, background: '#1a1a1a', color: '#fff', border: 'none', borderRadius: '8px', padding: '11px', fontSize: '13px', cursor: 'pointer', fontFamily: sans }}>
+                Enviar calificación
+              </button>
+              <button onClick={() => { setModalCalifConductor(null); setFormCalifConductor({ estrellas: 0, comentario: '' }); }}
+                style={{ background: '#EDEDE9', color: '#1a1a1a', border: 'none', borderRadius: '8px', padding: '11px 20px', fontSize: '13px', cursor: 'pointer', fontFamily: sans }}>
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ─────────────────────────────────────────────────────────────────── */}
 
       <div className="navbar" style={{ background: '#1a1a1a', padding: '0 40px', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span style={{ fontSize: '14px', fontWeight: 500, color: '#fff', fontFamily: sans }}>CARPODRIVE — Conductor</span>
@@ -528,8 +670,8 @@ export default function DriverDashboard() {
               <div style={{ ...inputStyle, width: '110px', display: 'flex', alignItems: 'center', background: '#EDEDE9', fontWeight: 500 }}>
                 $7.000
               </div>
-            <p style={{ fontSize: '10px', color: '#9E9890', marginTop: '4px', fontFamily: sans }}>Tarifa fija</p>
-        </div>
+              <p style={{ fontSize: '10px', color: '#9E9890', marginTop: '4px', fontFamily: sans }}>Tarifa fija</p>
+            </div>
             <button onClick={handlePublicar} style={{ background: '#1a1a1a', color: '#fff', border: 'none', borderRadius: '8px', padding: '10px 24px', fontSize: '13px', cursor: 'pointer', fontFamily: sans, whiteSpace: 'nowrap' }}>Publicar</button>
           </div>
           <div>
@@ -545,6 +687,123 @@ export default function DriverDashboard() {
           <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '22px', fontFamily: sans }}>Mapa de mis rutas</p>
           {usuario?.id && <MapaRutas tipo="conductor" usuario_id={usuario.id} />}
         </div>
+
+        {/* ── FUNCIONALIDAD: Rutas Recurrentes ─────────────────────────────
+            Sección donde el conductor crea y gestiona rutas que se publican
+            automáticamente cada semana según los días seleccionados.
+            Al abrir el dashboard, el sistema revisa si hay rutas recurrentes
+            activas y las publica automáticamente si corresponde al día de hoy.
+        ─────────────────────────────────────────────────────────────────── */}
+        <div className="card" style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '20px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '22px' }}>
+            <div>
+              <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '2px', textTransform: 'uppercase', fontFamily: sans }}>Rutas recurrentes</p>
+              <p style={{ fontSize: '12px', color: '#9E9890', marginTop: '4px', fontFamily: sans }}>Se publican automáticamente cada semana</p>
+            </div>
+            <button onClick={() => setMostrarFormRecurrente(!mostrarFormRecurrente)}
+              style={{ background: mostrarFormRecurrente ? '#EDEDE9' : '#1a1a1a', color: mostrarFormRecurrente ? '#1a1a1a' : '#fff', border: 'none', borderRadius: '8px', padding: '8px 16px', fontSize: '12px', cursor: 'pointer', fontFamily: sans }}>
+              {mostrarFormRecurrente ? 'Cancelar' : '+ Nueva recurrente'}
+            </button>
+          </div>
+
+          {/* Formulario para crear una ruta recurrente */}
+          {mostrarFormRecurrente && (
+            <div style={{ background: '#FAFAF8', border: '0.5px solid #D6CCC2', borderRadius: '12px', padding: '20px', marginBottom: '20px' }}>
+              <p style={{ fontSize: '11px', color: '#9E9890', letterSpacing: '1px', textTransform: 'uppercase', marginBottom: '16px', fontFamily: sans }}>Nueva ruta recurrente</p>
+
+              {/* Selector de días de la semana */}
+              <div style={{ marginBottom: '16px' }}>
+                <label style={labelStyle}>Días de la semana</label>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  {[{ n: 1, l: 'Lun' }, { n: 2, l: 'Mar' }, { n: 3, l: 'Mié' }, { n: 4, l: 'Jue' }, { n: 5, l: 'Vie' }, { n: 6, l: 'Sáb' }, { n: 7, l: 'Dom' }].map(d => (
+                    <button key={d.n} onClick={() => toggleDia(d.n)}
+                      style={{ background: formRecurrente.dias_semana.includes(d.n) ? '#1a1a1a' : '#EDEDE9', color: formRecurrente.dias_semana.includes(d.n) ? '#fff' : '#1a1a1a', border: 'none', borderRadius: '8px', padding: '8px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: sans, fontWeight: 500 }}>
+                      {d.l}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto auto auto', gap: '16px', alignItems: 'flex-end', marginBottom: '16px' }}>
+                <div>
+                  <label style={labelStyle}>Origen</label>
+                  <select style={inputStyle} value={formRecurrente.origen} onChange={e => setFormRecurrente({ ...formRecurrente, origen: e.target.value })}>
+                    {origenSelect}
+                  </select>
+                </div>
+                <div>
+                  <label style={labelStyle}>Destino</label>
+                  <select style={inputStyle} value={formRecurrente.destino} onChange={e => setFormRecurrente({ ...formRecurrente, destino: e.target.value })}>
+                    {destinoSelect}
+                  </select>
+                </div>
+                <div>
+                  <label style={labelStyle}>Hora</label>
+                  <input type="time" style={{ ...inputStyle, width: 'auto' }} value={formRecurrente.hora_salida}
+                    onChange={e => setFormRecurrente({ ...formRecurrente, hora_salida: e.target.value })} />
+                </div>
+                <div>
+                  <label style={labelStyle}>Puestos</label>
+                  <input type="number" min="1" max="4" style={{ ...inputStyle, width: '70px' }} value={formRecurrente.puestos}
+                    onChange={e => setFormRecurrente({ ...formRecurrente, puestos: parseInt(e.target.value) })} />
+                </div>
+                <button onClick={handleCrearRecurrente}
+                  style={{ background: '#1a1a1a', color: '#fff', border: 'none', borderRadius: '8px', padding: '10px 20px', fontSize: '13px', cursor: 'pointer', fontFamily: sans, whiteSpace: 'nowrap' as const }}>
+                  Guardar
+                </button>
+              </div>
+              <div>
+                <label style={labelStyle}>Punto de encuentro (opcional)</label>
+                <input type="text" placeholder="Ej: Entrada principal del metro..." style={inputStyle} value={formRecurrente.punto_encuentro}
+                  onChange={e => setFormRecurrente({ ...formRecurrente, punto_encuentro: e.target.value })} />
+              </div>
+            </div>
+          )}
+
+          {/* Lista de rutas recurrentes existentes */}
+          {rutasRecurrentes.length === 0 ? (
+            <p style={{ color: '#9E9890', fontSize: '13px', textAlign: 'center', padding: '20px 0', fontFamily: sans }}>No tienes rutas recurrentes. Crea una y se publicará automáticamente cada semana.</p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {rutasRecurrentes.map((rr: any) => {
+                const diasNombres: Record<number, string> = { 1:'Lun', 2:'Mar', 3:'Mié', 4:'Jue', 5:'Vie', 6:'Sáb', 7:'Dom' };
+                const dias = rr.dias_semana.split(',').map(Number).map((d: number) => diasNombres[d]).join(' · ');
+                return (
+                  <div key={rr.id} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto auto auto auto', gap: '16px', alignItems: 'center', padding: '16px 20px', background: '#FAFAF8', border: `0.5px solid ${rr.activa ? '#D6CCC2' : '#EDEDE9'}`, borderRadius: '10px', opacity: rr.activa ? 1 : 0.6 }}>
+                    <div>
+                      <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>RUTA</p>
+                      <p style={{ fontSize: '13px', color: '#1a1a1a', fontWeight: 500, fontFamily: sans }}>{rr.origen} → {rr.destino}</p>
+                      {rr.punto_encuentro && <p style={{ fontSize: '11px', color: '#9E9890', marginTop: '2px', fontFamily: sans }}>📍 {rr.punto_encuentro}</p>}
+                    </div>
+                    <div>
+                      <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '4px', fontFamily: sans, letterSpacing: '1px' }}>DÍAS</p>
+                      <p style={{ fontSize: '12px', color: '#1a1a1a', fontFamily: sans }}>{dias}</p>
+                      <p style={{ fontSize: '11px', color: '#9E9890', fontFamily: sans }}>{rr.hora_salida}</p>
+                    </div>
+                    <div>
+                      <span style={{ fontSize: '11px', padding: '4px 12px', borderRadius: '20px', fontWeight: 500, fontFamily: sans, background: rr.activa ? '#d1fae5' : '#EDEDE9', color: rr.activa ? '#065f46' : '#9E9890' }}>
+                        {rr.activa ? 'Activa' : 'Pausada'}
+                      </span>
+                    </div>
+                    <div>
+                      <p style={{ fontSize: '10px', color: '#9E9890', marginBottom: '2px', fontFamily: sans }}>PUESTOS</p>
+                      <p style={{ fontSize: '13px', color: '#1a1a1a', fontFamily: sans }}>{rr.puestos}</p>
+                    </div>
+                    <button onClick={() => handleToggleRecurrente(rr.id, !rr.activa)}
+                      style={{ background: '#EDEDE9', color: '#1a1a1a', border: 'none', borderRadius: '8px', padding: '7px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: sans, whiteSpace: 'nowrap' as const }}>
+                      {rr.activa ? 'Pausar' : 'Activar'}
+                    </button>
+                    <button onClick={() => handleEliminarRecurrente(rr.id)}
+                      style={{ background: '#fee2e2', color: '#991b1b', border: 'none', borderRadius: '8px', padding: '7px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: sans }}>
+                      Eliminar
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+        {/* ─────────────────────────────────────────────────────────────────── */}
 
         {/* Mis rutas */}
         <div className="card" style={{ background: '#fff', border: '0.5px solid #D6CCC2', borderRadius: '16px', padding: '28px 32px', marginBottom: '20px' }}>
@@ -627,12 +886,27 @@ export default function DriverDashboard() {
                                   </p>
                                 </div>
                               </div>
-                              {res.estado === 'confirmada' && (
-                                <button onClick={() => setChatReserva({ ...res, origen: ruta.origen, destino: ruta.destino })}
-                                  style={{ background: '#1a1a1a', color: '#fff', border: 'none', borderRadius: '8px', padding: '7px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: sans }}>
-                                  💬 Chat
-                                </button>
-                              )}
+                              {/* ── FUNCIONALIDAD: Botones Chat y Calificar ── */}
+                              <div style={{ display: 'flex', gap: '8px' }}>
+                                {res.estado === 'confirmada' && (
+                                  <button onClick={() => setChatReserva({ ...res, origen: ruta.origen, destino: ruta.destino })}
+                                    style={{ background: '#1a1a1a', color: '#fff', border: 'none', borderRadius: '8px', padding: '7px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: sans }}>
+                                    💬 Chat
+                                  </button>
+                                )}
+                                {/* Botón calificar: visible cuando la reserva está completada y el conductor no ha calificado aún */}
+                                {res.estado === 'completada' && !yaCalificadoConductor[res.id] && (
+                                  <button onClick={() => setModalCalifConductor({
+                                    reserva_id: res.id,
+                                    pasajero_id: res.pasajero_id,
+                                    pasajero_nombre: res.pasajero_nombre,
+                                  })}
+                                    style={{ background: '#fbbf24', color: '#1a1a1a', border: 'none', borderRadius: '8px', padding: '7px 14px', fontSize: '12px', cursor: 'pointer', fontFamily: sans }}>
+                                    ⭐ Calificar
+                                  </button>
+                                )}
+                              </div>
+                              {/* ────────────────────────────────────────── */}
                             </div>
                           ))}
                         </div>
